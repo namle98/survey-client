@@ -86,8 +86,11 @@ export default {
             title: "Danh sách",
             page: "survey-sections/list",
           },
+
         ],
       },
+     
+
       // {
       //   title: "Demo component",
       //   root: true,
@@ -144,6 +147,26 @@ export default {
           },
         ],
       },
+      {
+        title: "Quản lý cuộc khảo sát",
+        root: true,
+        bullet: "dot",
+        icon: "flaticon2-writing",
+        submenu: [
+          {
+            title: "Thêm",
+            page: "survey/add",
+          },
+          {
+            title: "Danh sách",
+            page: "survey/list",
+          },
+        ]
+      },
+
+
     ],
   },
+
+  
 };

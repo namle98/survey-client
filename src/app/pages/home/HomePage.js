@@ -58,6 +58,9 @@ const ListForm = lazy(() => import("../form/ListForm"));
 // const AddForm = lazy(() => import("../form/AddForm"));
 const ListAnswers = lazy(() => import("../answers/ListAnswers"));
 
+const AddSurvey = lazy(() => import("../surveys/AddSurvey"));
+const ListSurvey = lazy(() => import("../surveys/ListSurvey"));
+const Test = () => import("../surveys/test");
 {
   /* =============Error Page============= */
 }
@@ -112,6 +115,10 @@ export default function HomePage() {
         />
         <Route path="/survey-sections/list" component={ListSurveySection} />
 
+        {/* Router survey  */}
+        <Route path="/survey/add" exact component={AddSurvey} />
+        <Route path="/survey/list" exact component={ListSurvey} />
+
         {/* Route other */}
         <Route path="/dashboard" component={Dashboard} />
 
@@ -124,6 +131,9 @@ export default function HomePage() {
         <Route path="/form/list" component={ListForm} />
         <Route path="/form/edit/:id" component={EditForm} />
         <Route path="/answers" component={ListAnswers} />
+
+        {/* test */}
+        <Route path="/test" component={Test} />
 
         {/* <Redirect to="Error403" /> */}
         <Route path="/Error403" component={Error403} />
