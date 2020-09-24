@@ -3,6 +3,7 @@ import { Button, Input, Radio } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { RADIO, SINGLE_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
+import { showErrorMessage } from "../actions/notification";
 
 const SingleChoise = (props) => {
 
@@ -14,9 +15,9 @@ const SingleChoise = (props) => {
   const [listDelete, setListDelete] = useState([]);
 
   const [rowLabel, setRowLabel] = useState([
-    { title: "Nội dung hàng 1", unique: 'abcdefgh' },
-    { title: "Nội dung hàng 2", unique: 'iklmnopq' },
-    { title: "Nội dung hàng 3", unique: 'rstuvxyz' },
+    { title: "", unique: 'abcdefgh' },
+    { title: "", unique: 'iklmnopq' },
+    { title: "", unique: 'rstuvxyz' },
   ]);
 
   let objSingleChoise = {
@@ -97,22 +98,36 @@ const SingleChoise = (props) => {
       let question = {};
       question.id = e.id || '';
       question.title = e.title;
+    
       question.type = RADIO;
       question.index = i;
       question.input_type_id = SINGLE_CHOISE;
       objSingleChoise.question_choise.push(question);
+
+     
     });
 
-    objSingleChoise.delete_choises = listDelete;
-
-    if (preTitle !== "") {
-      setTitle(preTitle);
-      objSingleChoise.title = preTitle;
+    for ( var n = 0 ; n < rowLabel.length ; n++)
+    {
+      if(rowLabel[n].title === ""){
+        return showErrorMessage("Lỗi");
+      };
     }
+    objSingleChoise.delete_choises = listDelete;
+   
+   
+    if (preTitle === "") {
+      return showErrorMessage("Lỗi");
+    }
+
+
+    setTitle(preTitle);
+    objSingleChoise.title = preTitle;
+
     props.onCancel();
     props.getDataSection(objSingleChoise);
   };
-
+ 
   const editHandle = (e) => {
     e = window.event || e;
     props.onEdit();

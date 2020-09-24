@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { COMMENT_BOX } from '../config/common/TypeOfInput';
 
+import { showErrorMessage } from "../actions/notification";
 const CommentBox = (props) => {
   const [title, setTitle] = useState(
     props.title
@@ -26,12 +27,20 @@ const CommentBox = (props) => {
   };
 
   const handleSaveCommentBox = (e) => {
-    if (titleUpdate !== "") {
-      setTitle(titleUpdate);
-      data.title = titleUpdate;
-    }
-    props.getDataSection(data);
-    props.onCancel();
+    if (titleUpdate === "") {
+      return showErrorMessage("Lỗi ");
+      
+     }
+    
+       else {
+        setTitle(titleUpdate);
+        data.title = titleUpdate;
+      
+      props.getDataSection(data);
+      props.onCancel();
+     }
+
+
   };
 
   return (

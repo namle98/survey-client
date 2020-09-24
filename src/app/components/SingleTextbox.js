@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { SINGLE_TEXTBOX } from '../config/common/TypeOfInput';
+import { showErrorMessage } from "../actions/notification";
 
 const SingleTextbox = (props) => {
   const [title, setTitle] = useState(
@@ -21,22 +22,34 @@ const SingleTextbox = (props) => {
     e = window.event || e;
     e.preventDefault();
     setTitleUpdate(e.target.value);
+
   };
 
   const handleSaveTextbox = (e) => {
-    if (titleUpdate !== "") {
+    if (titleUpdate === "") {
+     return showErrorMessage("Lỗi ");
+     
+    }
+   
+      else {
       setTitle(titleUpdate);
       data.title = titleUpdate;
+
+      props.onCancel();
+      props.getDataSection(data);
     }
-    props.onCancel();
-    props.getDataSection(data);
+    
   };
+
+
+
 
   return (
     <>
       {props.isEdit ? (
         <div style={{ marginTop: '5px', height: '100px' }}>
-          <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+          <p className='title-question'>Câu {props.stt + 1}. {title}</p>
+          <Input
             style={{ marginBottom: "10px", height: '38px' }}
             type="text"
             onChange={handleChangeTextbox}
@@ -53,6 +66,7 @@ const SingleTextbox = (props) => {
             type="primary"
             size="small"
             onClick={handleSaveTextbox}
+
           >
             Save
           </Button>
@@ -60,7 +74,7 @@ const SingleTextbox = (props) => {
       ) : (
           <div>
             <div onClick={props.onEdit} style={{ cursor: "pointer" }}>
-            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
+              <p className='title-question'>Câu {props.stt + 1}. {title}</p>
               <Input type="text" />
             </div>
           </div>

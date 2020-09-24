@@ -60,7 +60,9 @@ const surveySectionTemp = {
 const questionTemp = {
   title: "Tiêu đề câu hỏi",
   note: "",
-  input_type_id: 1,
+  input_type_id: 1
+
+ 
 }
 
 const AddForm = (props) => {
@@ -122,11 +124,21 @@ const AddForm = (props) => {
     setStep(3);
   };
 
+
+  // const passStep3 = () => {
+  //   if(!surveyContent.organization..questionTemp.note){
+  //     return showErrorMessage("Vui lòng nhập câu hỏi");
+  //   }
+
+
+  // }
+
   const backStep = (step) => {
     setStep(step);
   };
 
   const saveSurveySection = (surveySection) => {
+   
     dataSend = surveyTemp;
     dataSend.organization.survey_sections = surveySection;
   };
@@ -135,12 +147,18 @@ const AddForm = (props) => {
   const onAddQuestionToSection = (idxSec) => {
     let organization = { ...surveyContent };
     organization.organization.survey_sections[idxSec].questions.push(questionTemp);
+   
     setSurveyContent(organization);
   }
 
   const onUpdateQuestionFromSection = (question, idxSec, idxQues) => {
     let organization = { ...surveyContent };
     organization.organization.survey_sections[idxSec].questions[idxQues] = question;
+    // if( organization.organization.survey_sections[idxSec].questions[idxQues].input_type_id  === 1 && organization.organization.survey_sections[idxSec].questions[idxQues].note === "")
+    // {
+    //   showErrorMessage("vui lòng nhập ");
+    // }
+    
     setSurveyContent(organization);
   }
 
@@ -161,6 +179,7 @@ const AddForm = (props) => {
   const saveForm = (e) => {
     e = window.event || e;
     e.preventDefault();
+    
     setLoadSubmit(true);
     makeRequest('post', `surveyform/create`, surveyContent).then(({ data }) => {
       if (data.signal) {
