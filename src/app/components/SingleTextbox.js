@@ -1,27 +1,32 @@
 import React, { useState } from "react";
 import { Input, Button } from "antd";
+import { SINGLE_TEXTBOX } from '../config/common/TypeOfInput';
 
 const SingleTextbox = (props) => {
   const [title, setTitle] = useState(
-    "Do you have any other comments, questions, or concerns?"
+    props.title
   );
   const [titleUpdate, setTitleUpdate] = useState("");
   let data = {
+    id: props.id || '',
     title: title,
     node: "single textbox",
     parent_id: 0,
     have_child: false,
     type: 1,
-    input_type_id: props.type
+    input_type_id: SINGLE_TEXTBOX
   };
 
   const handleChangeTextbox = (e) => {
+    e = window.event || e;
+    e.preventDefault();
     setTitleUpdate(e.target.value);
   };
 
   const handleSaveTextbox = (e) => {
     if (titleUpdate !== "") {
       setTitle(titleUpdate);
+      data.title = titleUpdate;
     }
     props.onCancel();
     props.getDataSection(data);
@@ -30,9 +35,9 @@ const SingleTextbox = (props) => {
   return (
     <>
       {props.isEdit ? (
-        <div>
-          <Input
-            style={{ marginBottom: "10px" }}
+        <div style={{ marginTop: '5px', height: '100px' }}>
+          <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+            style={{ marginBottom: "10px", height: '38px' }}
             type="text"
             onChange={handleChangeTextbox}
             defaultValue={title}
@@ -40,7 +45,7 @@ const SingleTextbox = (props) => {
           <Button
             style={{ marginRight: '5px' }}
             size="small"
-            onClick={() => props.onCancel}
+            onClick={props.onCancel}
           >
             Cancel
           </Button>
@@ -55,7 +60,7 @@ const SingleTextbox = (props) => {
       ) : (
           <div>
             <div onClick={props.onEdit} style={{ cursor: "pointer" }}>
-              Câu {props.stt + 1}. {title}.
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
               <Input type="text" />
             </div>
           </div>

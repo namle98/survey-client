@@ -6,7 +6,7 @@ import GridTextbox from './GridTextbox';
 import SingleTextbox from './SingleTextbox';
 import MultiChoise from './MultiChoise';
 import SingleChoise from './SingleChoise';
-import CheckboxDemo from './CheckboxDemo';
+//import CheckboxDemo from './CheckboxDemo';
 import DropSelectComponent from './DropSelectComponent';
 
 export {
@@ -18,6 +18,6 @@ export {
     SingleTextbox,
     MultiChoise,
     SingleChoise,
-    CheckboxDemo,
+    //CheckboxDemo,
     DropSelectComponent
 }

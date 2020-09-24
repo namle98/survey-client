@@ -8,6 +8,8 @@ import Organization from "../../components/Organization/Organization";
 import makeRequest from '../../libs/request';
 import Loading from '../loading';
 import { Card } from "react-bootstrap";
+import './Form.scss';
+import './table.css';
 
 const surveyTemp = {
   organization: {
@@ -28,7 +30,7 @@ const surveyTemp = {
         questions: [
           {
             id: 1,
-            title: "test title",
+            title: "Tiêu đề câu hỏi",
             note: "",
             input_type_id: 1,
           },
@@ -47,7 +49,7 @@ const surveySectionTemp = {
   questions: [
     {
       id: 1,
-      title: "test title",
+      title: "Tiêu đề câu hỏi",
       note: "",
       input_type_id: 1,
     },
@@ -55,7 +57,7 @@ const surveySectionTemp = {
 }
 
 const questionTemp = {
-  title: "test title",
+  title: "Tiêu đề câu hỏi",
   note: "",
   input_type_id: 1,
 }
@@ -93,9 +95,8 @@ const FormSurvey = (props) => {
       return showErrorMessage("Vui lòng nhập tiêu đề form");
     }
 
-    console.log('surveyContent.organization.type', surveyContent.organization.type)
     if (!surveyContent.organization.type) {
-      return showErrorMessage("Vui lòng nhập loại form giá trị 1 hoặc 2");
+      return showErrorMessage("Vui lòng chọn loại form");
     }
     setStep(2);
   };
@@ -123,74 +124,15 @@ const FormSurvey = (props) => {
     setStep(step);
   };
 
-  const addQuestionToSection = (e, idxSection) => {
-    e = window.event || e;
-    e.preventDefault();
-
-    let surveySectionsTemp = [...surveyContent.organization.survey_sections];
-    let selectdSection = surveySectionsTemp.find(
-      (item) => item.id === idxSection
-    );
-    let sectionIdx = surveySectionsTemp.findIndex(
-      (item) => item.id === idxSection
-    );
-    surveySectionsTemp[sectionIdx].questions.push({
-      id: selectdSection.lastQuesId,
-      title: "Câu hỏi?",
-      note: "",
-      input_type_id: 1,
-    });
-
-    setSurveyContent({
-      ...surveyContent,
-      survey_sections: surveySectionsTemp,
-    });
-  };
-
-  const saveQuestion = (survey_sections) => {
-    let organization = { ...surveyContent.organization };
-    let currentId = organization.survey_sections.findIndex(
-      (e) => e.id === survey_sections.id
-    );
-    organization.survey_sections[currentId] = survey_sections;
-    setSurveyContent({
-      ...surveyContent,
-      organization,
-    });
-  };
-
   const saveSurveySection = (surveySection) => {
     dataSend = surveyTemp;
     dataSend.organization.survey_sections = surveySection;
   };
 
-  const onChangeContentSurveySection = (e, key) => {
-    e = window.event || e;
-    e.preventDefault();
-
-    let organization = surveyContent.organization;
-    organization.survey_sections[key] = e.target.value;
-    setSurveyContent({
-      ...surveyContent,
-      organization,
-    });
-  }
-
   const onAddQuestionToSection = (idxSec) => {
     let organization = { ...surveyContent };
     organization.organization.survey_sections[idxSec].questions.push(questionTemp);
     setSurveyContent(organization);
-  }
-
-  const onRemoveQuestionFromSection = (e, idxSec, idxQues) => {
-    e = window.event || e;
-    e.preventDefault();
-    let organization = { ...surveyContent };
-    organization.organization.survey_sections[idxSec].questions.filter(item => item.id !== idxQues);
-    setSurveyContent({
-      ...surveyContent,
-      organization,
-    });
   }
 
   const onUpdateQuestionFromSection = (question, idxSec, idxQues) => {

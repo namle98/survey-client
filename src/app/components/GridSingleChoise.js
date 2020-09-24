@@ -1,127 +1,185 @@
 /* eslint-disable array-callback-return */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Radio, Button, Input } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
-
-let indexRow = 4;
-let indexColumn = 3;
-let currentRowLabel = [];
-let currentColumnLabel = [];
+import { RADIO, GRID_SINGLE_CHOISE } from '../config/common/TypeOfInput';
+import { generateRandomCode } from '../libs/random';
+import './QuestionItem.scss';
 
 const GridSingleChoise = (props) => {
-  const [isEdit, setEdit] = useState(false);
   const [preTitle, setPreTitle] = useState("");
-  const [title, setTitle] = useState(
-    "Do you have any other comments, questions, or concerns?"
-  );
+  const [title, setTitle] = useState(props.title);
+  const [currentRowLabel, setCurrentRowLabel] = useState([]);
+  const [listRowDelete, setListRowDelete] = useState([]);
+  const [listColDelete, setListColDelete] = useState([]);
+  const [currentColumnLabel, setCurrentColumnLabel] = useState([]);
   const [rowLabel, setRowLabel] = useState([
-    { id: 1, content: "rowlabel 1" },
-    { id: 2, content: "rowlabel 2" },
-    { id: 3, content: "rowlabel 3" },
-  ]);
-  const [columnLabel, setColumnLabel] = useState([
-    { id: 1, content: "columnLabel 1" },
-    { id: 2, content: "columnLabel 2" },
+    { title: "Nội dung hàng 1", unique: 'abcdefgh' },
+    { title: "Nội dung hàng 2", unique: 'iklmnopq' },
+    { title: "Nội dung hàng 3", unique: 'rstuvxyz' }
   ]);
 
-  let data = {
-    id: "abcd-efgh-mlqt-xzyx_question_3",
+  const [columnLabel, setColumnLabel] = useState([
+    { title: "Nội dung cột 1", type: RADIO, unique: 'abcdefgh' },
+    { title: "Nội dung cột 2", type: RADIO, unique: 'iklmnopq' },
+  ]);
+
+  const componentDidMount = () => {
+    if (props.item && props.item.question_row) {
+      let rowItem = props.item.question_row.map(item => {
+        return {
+          id: item.id,
+          title: item.title
+        }
+      });
+      setCurrentRowLabel([...rowItem]);
+      setRowLabel(rowItem);
+    } else {
+      setCurrentRowLabel(rowLabel);
+    }
+
+    if (props.item && props.item.question_columns) {
+      let columnItem = props.item.question_columns.map(item => {
+        return {
+          id: item.id,
+          title: item.title,
+          type: item.type
+        }
+      });
+      setCurrentColumnLabel([...columnItem]);
+      setColumnLabel(columnItem);
+    } else {
+      setCurrentColumnLabel(columnLabel);
+    }
+  }
+
+  useEffect(componentDidMount, []);
+
+  let objGridSingleChoise = {
+    id: props.id || '',
     title: title,
     note: "",
     parent_id: 0,
     have_child: false,
     index: 1,
     type: 1, //1 là bình thường, 2 là mẫu
-    input_type_id: props.type, // 8 là table_string....
+    input_type_id: GRID_SINGLE_CHOISE, // 8 là table_string....
     question_columns: [],
-    question_row: [],
+    question_row: []
   };
 
-  let columns = {};
-
-  let row = {};
-
   const handleChange = (e) => {
+    e = window.event || e;
     e.preventDefault();
     setPreTitle(e.target.value);
   };
 
-  const handleChangeRowLabel = (e, id) => {
+  const handleChangeRowLabel = (e, idx) => {
     e = window.event || e;
     e.preventDefault();
-
     let row = [...rowLabel];
-    let objUpdate = row.findIndex((item) => item.id === id);
-    row[objUpdate].content = e.target.value;
+    row[idx].title = e.target.value;
     setRowLabel(row);
   };
 
-  const handleChangeColumnLabel = (e, id) => {
+  const handleChangeColumnLabel = (e, idx) => {
     e = window.event || e;
     e.preventDefault();
-
     let row = [...columnLabel];
-    let objUpdate = row.findIndex((item) => item.id === id);
-    row[objUpdate].content = e.target.value;
+    row[idx].title = e.target.value;
     setColumnLabel(row);
   };
 
   const addRowLabel = () => {
-    let id = indexRow++;
-    let content = "";
+    let title = "";
+    let unique = generateRandomCode(6);
     let data = [...rowLabel];
-    currentRowLabel = [...rowLabel];
-    data.push({ id, content });
+    data.push({ title, unique });
     setRowLabel(data);
   };
 
   const addColumnLabel = () => {
-    let id = indexColumn++;
-    let content = "";
+    let title = "";
+    let unique = generateRandomCode(6);
     let data = [...columnLabel];
-    currentColumnLabel = [...columnLabel];
-    data.push({ id, content });
+    let type = RADIO;
+    data.push({ title, type, unique });
     setColumnLabel(data);
   };
 
-  const removeRowLabel = (e, id) => {
+  const removeRowLabel = (e, idx) => {
     e.preventDefault();
     let data = [...rowLabel];
-    data = data.filter((item) => item.id !== id);
-    setRowLabel(data);
+    if (data[idx].id) {
+      let listRowDel = [...listRowDelete];
+      listRowDel.push(data[idx]);
+      setListRowDelete(listRowDel);
+    }
+
+    let datafilter = data.filter((_item, index) => {
+      if (index !== idx) {
+        return true;
+      }
+      return false;
+    });
+    setRowLabel(datafilter);
   };
 
-  const removeColumnLabel = (e, id) => {
+  const removeColumnLabel = (e, idx) => {
     e.preventDefault();
     let data = [...columnLabel];
-    data = data.filter((item) => item.id !== id);
-    setColumnLabel(data);
+    if (data[idx].id) {
+      let listColDel = [...listColDelete];
+      listColDel.push(data[idx]);
+      setListColDelete(listColDel);
+    }
+    let datafilter = data.filter((_item, index) => {
+      if (index !== idx) {
+        return true;
+      }
+      return false;
+    });
+    setColumnLabel(datafilter);
   };
 
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    currentColumnLabel = [...columnLabel];
-    currentRowLabel = [...rowLabel];
+
+    setCurrentColumnLabel(...columnLabel);
+
+    setCurrentRowLabel(...rowLabel);
+
     columnLabel.map((e, i) => {
-      columns.title = e.content;
-      columns.note = e.content;
-      columns.index = i;
-      data.question_columns.push(columns);
-      columns = {};
+      let column = {};
+      column.id = e.id || '';
+      column.title = e.title;
+      column.note = e.title;
+      column.index = i;
+      column.type = e.type;
+      objGridSingleChoise.question_columns.push(column);
     });
 
+    objGridSingleChoise.delete_cols = listColDelete;
+
     rowLabel.map((e, i) => {
-      row.note = e.content;
-      row.title = e.content;
-      data.question_row.push(row);
+      let row = {};
+      row.id = e.id || '';
+      row.note = e.title;
+      row.title = e.title;
+      objGridSingleChoise.question_row.push(row);
       row = {};
     });
+
+    objGridSingleChoise.delete_rows = listRowDelete;
+
     if (preTitle !== "") {
       setTitle(preTitle);
+      objGridSingleChoise.title = preTitle;
     }
+
     props.onCancel();
-    props.getDataSection(data);
+    props.getDataSection(objGridSingleChoise);
   };
 
   const editHandle = (e) => {
@@ -141,59 +199,66 @@ const GridSingleChoise = (props) => {
     <>
       {props.isEdit ? (
         <div>
-          <div>
+          <div style={{ marginTop: '5px' }}>
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
             <Input
-              style={{ marginBottom: "10px" }}
+              style={{ marginBottom: "10px", height: '38px' }}
               type="text"
               onChange={handleChange}
               defaultValue={title}
             />
           </div>
-          <label>Row label</label>
-          {rowLabel.map((item, i) => {
-            return (
-              <div key={i}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  onChange={(e) => handleChangeRowLabel(e, item.id)}
-                  defaultValue={item.content}
-                />
-                <AddCircleOutline
-                  style={{ cursor: "pointer" }}
-                  onClick={addRowLabel}
-                />
-                {rowLabel.length > 1 && (
-                  <RemoveCircleOutline
-                    style={{ cursor: "pointer" }}
-                    onClick={(e) => removeRowLabel(e, item.id)}
+          <label style={{ marginLeft: '15px' }}>Nhãn dòng</label>
+          {
+            rowLabel.map((item, idx) => {
+              return (
+                <div key={`row-${item.unique}`} style={{ marginBottom: '7px' }}>
+                  {idx + 1}. <Input
+                    style={{ width: "80%", marginRight: "10px" }}
+                    onChange={(e) => handleChangeRowLabel(e, idx)}
+                    defaultValue={item.title}
                   />
-                )}
-              </div>
-            );
-          })}
-          <label>Columns label</label>
-          {columnLabel.map((item, idx) => {
-            return (
-              <div key={idx}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  defaultValue={item.content}
-                  onChange={(e) => handleChangeColumnLabel(e, item.id)}
-                />
-                <AddCircleOutline
-                  style={{ cursor: "pointer" }}
-                  onClick={(e) => addColumnLabel(e)}
-                />
-                {columnLabel.length > 1 && (
-                  <RemoveCircleOutline
+                  <AddCircleOutline
                     style={{ cursor: "pointer" }}
-                    onClick={(e) => removeColumnLabel(e, item.id)}
+                    onClick={addRowLabel}
                   />
-                )}
-              </div>
-            );
-          })}
-          <div style={{ marginTop: "10px" }}>
+                  {rowLabel.length > 1 && (
+                    <RemoveCircleOutline
+                      style={{ cursor: "pointer" }}
+                      onClick={(e) => removeRowLabel(e, idx)}
+                    />
+                  )}
+                </div>
+              );
+            })
+          }
+
+          <label style={{ marginLeft: '15px' }}>Nhãn cột</label>
+          {
+            columnLabel.map((item, idx) => {
+              return (
+                <div key={`col-${item.unique}`} style={{ marginBottom: '7px' }}>
+                  {idx + 1}. <Input
+                    style={{ width: "80%", marginRight: "10px" }}
+                    defaultValue={item.title}
+                    onChange={(e) => handleChangeColumnLabel(e, idx)}
+                  />
+                  <AddCircleOutline
+                    style={{ cursor: "pointer" }}
+                    onClick={(e) => addColumnLabel()}
+                  />
+                  {columnLabel.length > 1 && (
+                    <RemoveCircleOutline
+                      style={{ cursor: "pointer" }}
+                      onClick={(e) => removeColumnLabel(e, idx)}
+                    />
+                  )}
+                </div>
+              );
+            })
+          }
+
+          <div style={{ marginTop: "10px", marginLeft: '15px' }}>
             <Button
               style={{ marginRight: '5px' }}
               size="small"
@@ -209,17 +274,18 @@ const GridSingleChoise = (props) => {
               Save
             </Button>
           </div>
-        </div>
+
+        </div >
       ) : (
           <>
-            Câu {props.stt + 1}. {title}.
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
             <div onClick={editHandle} style={{ cursor: "pointer" }}>
               <table>
                 <thead>
                   <tr>
-                    <th></th>
+                    <th className='td-table-create-question th-table-question-view'></th>
                     {columnLabel.map((e, i) => {
-                      return <th key={i}>{e.content}</th>;
+                      return <th key={i} className='td-table-create-question th-table-question-view'>{e.title}</th>;
                     })}
                   </tr>
                 </thead>
@@ -227,10 +293,10 @@ const GridSingleChoise = (props) => {
                   {rowLabel.map((item, i) => {
                     return (
                       <tr key={i}>
-                        <td>{item.content}</td>
+                        <td className='td-table-create-question'>{item.title}</td>
                         {columnLabel.map((sub, i) => {
                           return (
-                            <td key={i}>
+                            <td key={i} style={{ margin: 'auto', textAlign: 'center', border: 'solid', borderWidth: 'thin' }}>
                               <Radio />
                             </td>
                           );

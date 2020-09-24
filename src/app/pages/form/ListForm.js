@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-restricted-imports
 import { makeStyles } from "@material-ui/core/styles";
+import { Icon } from "@material-ui/core";
 import {
   Paper,
   Table,
@@ -15,15 +16,23 @@ import {
 import { Modal, Pagination, Button } from "antd";
 import { Form } from "react-bootstrap";
 import InputForm from "../../partials/common/InputForm";
-import { Card, Col } from "react-bootstrap";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { Card } from "react-bootstrap";
+import {
+  InfoCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import Loading from "../loading";
 import ButtonLoading from "../../partials/common/ButtonLoading";
 import makeRequest from "../../libs/request";
-import { Select, Radio } from "antd";
 import ShowFormSurvey from "./ShowFormSurvey";
-import { showSuccessMessageIcon, showErrorMessage } from "../../actions/notification";
-const { Option } = Select;
+import {
+  showSuccessMessageIcon,
+  showErrorMessage,
+} from "../../actions/notification";
+import "./table.css";
+import "./Form.scss";
+import FormSurveyExport from "../../components/ShowFormToExportWord/FormSurveyExport";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -48,8 +57,13 @@ const ListForm = (props) => {
   const [isLoadDelete, setLoadDelete] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [dataDetail, setDataDetail] = useState();
+  const [dataDetailExport, setDataDetailExport] = useState();
 
+  let checkData = [];
   useEffect(() => {
+    // if (dataDetailExport) {
+    //   exportToWord(dataDetailExport.organization.title);
+    // }
     searchanization({ page: 1, limit: rowsPerPage });
   }, []);
 
@@ -136,22 +150,141 @@ const ListForm = (props) => {
     e = window.event || e;
     e.preventDefault();
     setShowDetail(true);
-    makeRequest('get', `surveyform/getbyId?id=${id}`).then(({ data }) => {
-      if (data.signal) {
-        let detailObj = { organization: data.data };
-        detailObj.organization.survey_sections = [...data.data.survey_headers.survey_sections];
-        detailObj.organization.survey_headers.survey_sections = null;
-        setDataDetail(detailObj);
-      }
-    }).catch(err => {
-      showErrorMessage(err);
-    })
+    makeRequest("get", `surveyform/getbyId?id=${id}`)
+      .then(({ data }) => {
+        if (data.signal) {
+          let detailObj = { organization: data.data };
+          detailObj.organization.survey_sections = [
+            ...data.data.survey_headers.survey_sections,
+          ];
+          detailObj.organization.survey_headers.survey_sections = null;
+          detailObj.organization.survey_sections.sort((a, b) =>
+            a.index > b.index ? 1 : -1
+          );
+
+          for (
+            let i = 0;
+            i < detailObj.organization.survey_sections.length;
+            i++
+          ) {
+            detailObj.organization.survey_sections[i].questions.sort((a, b) =>
+              a.index > b.index ? 1 : -1
+            );
+            for (
+              let j = 0;
+              j < detailObj.organization.survey_sections[i].questions.length;
+              j++
+            ) {
+              detailObj.organization.survey_sections[i].questions[
+                j
+              ].question_choise.sort((a, b) => (a.index > b.index ? 1 : -1));
+              detailObj.organization.survey_sections[i].questions[
+                j
+              ].question_columns.sort(function(a, b) {
+                return a.speed - b.speed;
+              });
+              detailObj.organization.survey_sections[i].questions[
+                j
+              ].question_row.sort((a, b) => (a.index > b.index ? 1 : -1));
+            }
+          }
+          setDataDetail(detailObj);
+        }
+      })
+      .catch((err) => {
+        showErrorMessage(err);
+      });
   };
 
   const onClickCancelModal = () => {
     setDataDetail();
     setShowDetail(false);
-  }
+  };
+
+  const hanldeDetail = (id) => {
+    makeRequest("get", `surveyform/getbyId?id=${id}`)
+      .then(({ data }) => {
+        if (data.signal) {
+          let detailObj = { organization: data.data };
+          detailObj.organization.survey_sections = [
+            ...data.data.survey_headers.survey_sections,
+          ];
+          detailObj.organization.survey_headers.survey_sections = null;
+          detailObj.organization.survey_sections.sort((a, b) =>
+            a.index > b.index ? 1 : -1
+          );
+
+          for (
+            let i = 0;
+            i < detailObj.organization.survey_sections.length;
+            i++
+          ) {
+            detailObj.organization.survey_sections[i].questions.sort((a, b) =>
+              a.index > b.index ? 1 : -1
+            );
+            for (
+              let j = 0;
+              j < detailObj.organization.survey_sections[i].questions.length;
+              j++
+            ) {
+              detailObj.organization.survey_sections[i].questions[
+                j
+              ].question_choise.sort((a, b) => (a.index > b.index ? 1 : -1));
+              detailObj.organization.survey_sections[i].questions[
+                j
+              ].question_columns.sort(function(a, b) {
+                return a.speed - b.speed;
+              });
+              detailObj.organization.survey_sections[i].questions[
+                j
+              ].question_row.sort((a, b) => (a.index > b.index ? 1 : -1));
+            }
+          }
+          checkData = detailObj;
+          setDataDetailExport(detailObj);
+        }
+      })
+      .then(() => {
+        if (checkData) {
+          exportToWord(checkData.organization.title);
+        }
+      })
+      .catch((err) => {
+        showErrorMessage(err);
+      });
+  };
+
+  const exportToWord = (filename = "") => {
+    var header =
+      "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+      "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+      "xmlns='http://www.w3.org/TR/REC-html40'>" +
+      "<head><meta charset='utf-8'><title>Export HTML to Word Document with JavaScript</title></head><body>";
+    var footer = "</body></html>";
+    var html =
+      header + document.getElementById("source-html").innerHTML + footer;
+    var blob = new Blob(["\ufeff", html], {
+      type: "application/msword",
+    });
+    // var url =
+    //   "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+    var url = URL.createObjectURL(blob);
+    filename = filename ? filename + ".doc" : "document.doc";
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      downloadLink.href = url;
+      downloadLink.download = filename;
+      downloadLink.click();
+    }
+    document.body.removeChild(downloadLink);
+    setDataDetailExport();
+    setShowDetail(false);
+  };
 
   return (
     <>
@@ -161,32 +294,27 @@ const ListForm = (props) => {
       >
         Tạo form
       </Link>
-
       <div className="row">
         <div className="col-md-12">
           <div className="kt-section">
-            <div className="kt-section__content">
+            <div className="kt-section__content border-table-default">
               <Paper className={classes1.root}>
                 <div className="col-md-12">
                   <Form onSubmit={handleSubmit}>
-                    <div style={{ marginTop: 20, fontSize: 20 }}>
-                      <label>Tìm kiếm</label>
-                    </div>
+                    <div style={{ marginTop: 20, fontSize: 20 }}></div>
                     <div className="form-row">
-                      <div className="form-group col-md-2">
-                        <div className="form-group">
-                          <InputForm
-                            type="text"
-                            placeholder="Tên form"
-                            value={dataSearch.title || ""}
-                            onChangeValue={(value) => {
-                              onChangeValue("title", value);
-                            }}
-                            focus={true}
-                          />
-                        </div>
+                      <div className="col-md-5">
+                        <InputForm
+                          type="text"
+                          placeholder="Tên form"
+                          value={dataSearch.title || ""}
+                          onChangeValue={(value) => {
+                            onChangeValue("title", value);
+                          }}
+                          focus={true}
+                        />
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="col-md-3">
                         <div className="form-group" style={{ display: "flex" }}>
                           <button
                             className="btn btn-label-primary btn-bold btn-sm btn-icon-h kt-margin-l-10"
@@ -213,6 +341,7 @@ const ListForm = (props) => {
                 {isLoading ? (
                   <Loading />
                 ) : (
+                  <div className="col-md-12">
                     <Table className={classes1.table}>
                       <TableHead>
                         <TableRow>
@@ -225,61 +354,99 @@ const ListForm = (props) => {
                         {rows && rows.length ? (
                           rows.map((row, key) => (
                             <TableRow key={`organization-${key}`}>
-                              <TableCell>{row.title}</TableCell>
+                              <TableCell className="button-action-table">
+                                {row.title}
+                              </TableCell>
                               <TableCell>{row.code}</TableCell>
                               <TableCell>
                                 <div className="mg-b5">
-                                  <Button
-                                    type="primary"
-                                    size="small"
-                                    className="button-center-item "
-                                    onClick={(e) => {
-                                      detailOrganization(e, row.id);
-                                    }}
-                                    icon={<InfoCircleOutlined />}
+                                  <span
+                                    style={{ cursor: "pointer" }}
+                                    d
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Xem chi tiết"
                                   >
-                                    Chi tiết
-                                </Button>
-                                </div>
-                                <div className="mg-b5">
-                                  <Button
-                                    type="primary"
-                                    size="small"
-                                    className="button-center-item btn-success"
-                                    style={{ color: "white" }}
-                                    onClick={() =>
-                                      props.history.push(`/form/edit/${row.id}`)
-                                    }
-                                    icon={<InfoCircleOutlined />}
+                                    <Icon
+                                      className="fa fa-file"
+                                      onClick={(e) => {
+                                        detailOrganization(e, row.id);
+                                      }}
+                                      style={{
+                                        color: "#0000ff",
+                                        fontSize: 15,
+                                        marginLeft: 15,
+                                      }}
+                                    />
+                                  </span>
+                                  <span
+                                    style={{ cursor: "pointer" }}
+                                    d
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Sửa thông tin"
                                   >
-                                    Cập nhật
-                                </Button>
-                                </div>
-                                <div className="mg-b5">
-                                  <Button
-                                    type="primary"
-                                    size="small"
-                                    className="button-center-item btn-danger"
-                                    style={{ color: "white" }}
-                                    onClick={() => showModalDelete(row.id)}
-                                    icon={<InfoCircleOutlined />}
+                                    <Icon
+                                      className="fa fa-pen"
+                                      onClick={() =>
+                                        props.history.push(
+                                          `/form/edit/${row.id}`
+                                        )
+                                      }
+                                      style={{
+                                        color: "#ffa800",
+                                        fontSize: 15,
+                                        marginLeft: 15,
+                                      }}
+                                    />
+                                  </span>
+                                  <span
+                                    style={{ cursor: "pointer" }}
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Xóa thông tin"
                                   >
-                                    Xóa
-                                </Button>
+                                    <Icon
+                                      className="fa fa-trash"
+                                      onClick={(e) => showModalDelete(row.id)}
+                                      style={{
+                                        color: "rgb(220, 0, 78)",
+                                        fontSize: 15,
+                                        marginLeft: 15,
+                                      }}
+                                    />
+                                  </span>
+                                  <span
+                                    style={{ cursor: "pointer" }}
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="Xuất File"
+                                  >
+                                    <Icon
+                                      className="far fa-file-word"
+                                      style={{
+                                        color: "#0000ff",
+                                        fontSize: 15,
+                                        marginLeft: 15,
+                                      }}
+                                      onClick={() => hanldeDetail(row.id)}
+                                    />
+                                  </span>
                                 </div>
                               </TableCell>
                             </TableRow>
                           ))
                         ) : (
-                            <TableRow>
-                              <TableCell colSpan={10} align="center">
-                                Không có dữ liệu
-                          </TableCell>
-                            </TableRow>
-                          )}
+                          <TableRow>
+                            <TableCell colSpan={10} align="center">
+                              Không có dữ liệu
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
-                  )}
+                  </div>
+                )}
                 {total > rowsPerPage && (
                   <div className="custom-svg customSelector">
                     <Pagination
@@ -320,29 +487,29 @@ const ListForm = (props) => {
             <Modal
               title="Chi tiết form"
               visible={showDetail}
-              width={900}
+              width="280mm"
+              style={{ top: 20 }}
               onCancel={() => onClickCancelModal()}
               footer={[
                 <Button type="primary" onClick={() => onClickCancelModal()}>
                   OK
                 </Button>,
               ]}
+              className="modal-model-detail-form"
             >
-              {!dataDetail ? <Loading /> :
-                <div
-                  className="form-group"
-                  style={{
-                    height: "300px",
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                  }}
-                >
+              {!dataDetail ? (
+                <Loading />
+              ) : (
+                <div className="form-group form-view-detail">
                   <Card>
                     <ShowFormSurvey dataDetail={dataDetail} />
+                    {/* <FormSurveyExport dataDetail={dataDetail} /> */}
                   </Card>
-                </div>}
+                </div>
+              )}
             </Modal>
           </div>
+          <FormSurveyExport dataDetail={dataDetailExport} />
         </div>
       </div>
     </>

@@ -27,7 +27,7 @@ class HeaderMobile extends React.Component {
       >
         <div className="kt-header-mobile__logo">
           <Link to="/" style={{fontSize: '16px', fontWeight: 'bold', color: '#fff'}}>
-            <img alt="logo" src="/images/survey.png" width="110"/>
+            {/* <img alt="logo" src="/images/survey.png" width="110"/> */}
             {/* Survey */}
           </Link>
         </div>

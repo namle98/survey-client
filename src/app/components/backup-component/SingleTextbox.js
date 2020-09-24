@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button } from "antd";
 import { connect } from "react-redux";
-import * as actions from './../../store/actions/index';
+import * as actions from "./../../store/actions/index";
 
 const SingleTextbox = (props) => {
 	const [isEdit, setEdit] = useState(false);
-	const [title, setTitle] = useState(
-		"Do you have any other comments, questions, or concerns?"
-	);
-	const [titleUpdate, setTitleUpdate] = useState("");
+	const [title, setTitle] = useState();
+	const updateTile = props.dataUpdate
+		? props.dataUpdate.title
+		: "Do you have any other comments, questions, or concerns?";
+
+	useEffect(() => {
+		setTitle(updateTile);
+		props.onStateAdded(updateTile);
+	}, [updateTile]);
 
 	const handleClick = (handle) => {
 		switch (handle) {
@@ -23,13 +28,12 @@ const SingleTextbox = (props) => {
 	};
 
 	const handleChangeTextbox = (e) => {
-		setTitleUpdate(e.target.value);
+		setTitle(e.target.value);
 	};
 
 	const handleSaveTextbox = (e) => {
-		setTitle(titleUpdate);
 		setEdit(false);
-		props.onStateAdded(titleUpdate);
+		props.onStateAdded(title);
 	};
 
 	return (
@@ -43,31 +47,27 @@ const SingleTextbox = (props) => {
 						defaultValue={title}
 					/>
 					<Button
-						style={{marginRight: '5px'}}
+						style={{ marginRight: "5px" }}
 						size="small"
 						onClick={() => handleClick("cancel")}
 					>
 						Cancel
 					</Button>
-					<Button
-						type="primary"
-						size="small"
-						onClick={handleSaveTextbox}
-					>
+					<Button type="primary" size="small" onClick={handleSaveTextbox}>
 						Save
 					</Button>
 				</div>
 			) : (
-					<div>
-						<div
-							onClick={() => handleClick("edit")}
-							style={{ cursor: "pointer" }}
-						>
-							{props.stt}.{title}
-							<Input type="text" />
-						</div>
+				<div>
+					<div
+						onClick={() => handleClick("edit")}
+						style={{ cursor: "pointer" }}
+					>
+						{props.stt}.{title}
+						<Input type="text" />
 					</div>
-				)}
+				</div>
+			)}
 		</>
 	);
 };

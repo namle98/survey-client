@@ -132,7 +132,7 @@ function Login(props) {
                   ) : (
                       <div role="alert" className="alert alert-info">
                         <div className="alert-text">
-                          Use email and password to login <strong>CRM Survey</strong>.
+                          Use email and password to login <strong>Hệ Thông Điều Tra Khảo Sát</strong>.
                     </div>
                       </div>
                     )}

@@ -1,90 +1,107 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button } from "antd";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import RemoveCircleOutline from "@material-ui/icons/RemoveCircleOutline";
+import { STRING, GRID_TEXTBOX } from '../config/common/TypeOfInput';
+import { generateRandomCode } from '../libs/random';
+import './QuestionItem.scss';
 
-let index = 1;
-let indexRow = 4;
-let indexColumn = 3;
-let currentRowLabel = [];
-let currentColumnLabel = [];
 const GridTextbox = (props) => {
-  const [isEdit, setEdit] = useState(false);
   const [title, setTitle] = useState(
-    "Do you have any other comments, questions, or concerns?"
+    props.title
   );
-  const [titleUpdate, setTitleUpdate] = useState("");
+
+  const [titleUpdate, setTitleUpdate] = useState("")
+  const [currentRowLabel, setCurrentRowLabel] = useState([]);
+  const [currentColumnLabel, setSurrentColumnLabel] = useState([]);
+  const [listRowDelete, setListRowDelete] = useState([]);
+  const [listColDelete, setListColDelete] = useState([]);
+
   const [rowLabel, setRowLabel] = useState([
-    { id: 1, content: "rowlabel 1" },
-    { id: 2, content: "rowlabel 2" },
-    { id: 3, content: "rowlabel 3" },
-  ]);
-  const [columnLabel, setColumnLabel] = useState([
-    { id: 1, content: "columnLabel 1" },
-    { id: 2, content: "columnLabel 2" },
+    { title: "Nội dung hàng 1", unique: 'abcdefgh' },
+    { title: "Nội dung hàng 2", unique: 'iklmnopq' },
+    { title: "Nội dung hàng 3", unique: 'rstuvxyz' }
   ]);
 
-  let data = {
-    id: "abcd-efgh-mlqt-xzyx_question_3",
-    title: "Trong quá trình sản xuất, kinh doanh, thương mại...?",
+  const [columnLabel, setColumnLabel] = useState([
+    { title: "Nội dung cột 1", type: STRING, unique: 'abcdefgh' },
+    { title: "Nội dung cột 2", type: STRING, unique: 'iklmnopq' },
+  ]);
+
+  const componentDidMount = () => {
+    if (props.item && props.item.question_row) {
+      let rowItem = props.item.question_row.map(item => {
+        return {
+          id: item.id,
+          title: item.title
+        }
+      });
+      setCurrentRowLabel([...rowItem]);
+      setRowLabel(rowItem);
+    } else {
+      setCurrentRowLabel(rowLabel);
+    }
+
+    if (props.item && props.item.question_columns) {
+      let columnItem = props.item.question_columns.map(item => {
+        return {
+          id: item.id,
+          title: item.title,
+          type: item.type
+        }
+      });
+      setSurrentColumnLabel([...columnItem]);
+      setColumnLabel(columnItem);
+    } else {
+      setSurrentColumnLabel(columnLabel);
+    }
+  }
+
+  useEffect(componentDidMount, []);
+
+  let objGridTextbox = {
+    id: props.id || '',
+    title: title,
     note: "",
     parent_id: 0,
     have_child: false,
     index: 1,
     type: 1, //1 là bình thường, 2 là mẫu
-    input_type_id: props.type, // 8 là table_string....
+    input_type_id: GRID_TEXTBOX, // 8 là table_string....
     question_columns: [],
-    question_row: [],
+    question_row: []
   };
-  let columns = {};
-
-  let row = {};
 
   const handleChangeTextbox = (e) => {
+    e = window.event || e;
+    e.preventDefault();
     setTitleUpdate(e.target.value);
   };
-  const handleChangeTextboxRowLabel = (id, evn) => {
-    let currenId = rowLabel
-      .map((e) => {
-        return e.id;
-      })
-      .indexOf(id);
+  const handleChangeTextboxRowLabel = (e, idx) => {
     let newRowLabel = [...rowLabel];
-    newRowLabel[currenId] = {
-      ...newRowLabel[currenId],
-      content: evn.target.value,
-    };
+    newRowLabel[idx].title = e.target.value;
     setRowLabel(newRowLabel);
   };
 
-  const handleChangeTextboxColumnLabel = (id, evn) => {
-    let currenId = columnLabel
-      .map((e) => {
-        return e.id;
-      })
-      .indexOf(id);
-    let newColumnLabel = [...columnLabel];
-    newColumnLabel[currenId] = {
-      ...newColumnLabel[currenId],
-      content: evn.target.value,
-    };
-    setColumnLabel(newColumnLabel);
+  const handleChangeTextboxColumnLabel = (e, idx) => {
+    let objCol = [...columnLabel]
+    objCol[idx].title = e.target.value;
+    setColumnLabel(objCol);
   };
 
   const addRowLabel = () => {
-    let id = indexRow++;
-    let content = "";
+    let title = "";
+    let unique = generateRandomCode(6);
     let data = [...rowLabel];
-    currentRowLabel = [...rowLabel];
-    data.push({ id, content });
+    data.push({ title, unique });
     setRowLabel(data);
   };
 
   const addColumnLabel = () => {
-    let id = indexColumn++;
-    let content = "";
+    let title = "";
+    let unique = generateRandomCode(6);
     let data = [...columnLabel];
-    currentColumnLabel = [...columnLabel];
-    data.push({ id, content });
+    data.push({ title, type: STRING, unique });
     setColumnLabel(data);
   };
 
@@ -95,81 +112,135 @@ const GridTextbox = (props) => {
   };
 
   const handleSaveGridTextbox = () => {
-    currentRowLabel = [...rowLabel];
-    currentColumnLabel = [...columnLabel];
-    currentColumnLabel.map((e, i) => {
-      columns.title = e.content;
-      columns.note = e.content;
-      columns.index = i;
-      data.question_columns.push(columns);
-      columns = {};
+    setCurrentRowLabel([...rowLabel]);
+    setSurrentColumnLabel([...columnLabel]);
+    currentColumnLabel.forEach((e, i) => {
+      let column = {};
+      column.id = e.id;
+      column.title = e.title;
+      column.note = e.title;
+      column.index = i;
+      column.type = e.type;
+      objGridTextbox.question_columns.push(column);
     });
 
-    currentRowLabel.map((e, i) => {
-      row.note = e.content;
-      row.title = e.content;
-      data.question_row.push(row);
-      row = {};
+    objGridTextbox.delete_cols = listColDelete;
+
+    currentRowLabel.forEach((e, i) => {
+      let row = {};
+      row.id = e.id || '';
+      row.note = e.note;
+      row.title = e.title;
+      objGridTextbox.question_row.push(row);
     });
+
+    objGridTextbox.delete_rows = listRowDelete;
+
     if (titleUpdate !== "") {
       setTitle(titleUpdate);
+      objGridTextbox.title = titleUpdate;
     }
+    props.getDataSection(objGridTextbox);
     props.onCancel();
-    props.getDataSection(data);
+  };
+
+  const removeRowLabel = (e, idx) => {
+    e.preventDefault();
+    let data = [...rowLabel];
+    if (data[idx].id) {
+      let listRowDel = [...listRowDelete];
+      listRowDel.push(data[idx]);
+      setListRowDelete(listRowDel);
+    }
+    let datafilter = data.filter((_item, index) => {
+      if (index !== idx) {
+        return true;
+      }
+      return false;
+    });
+    setRowLabel(datafilter);
+  };
+
+  const removeColumnLabel = (e, idx) => {
+    e.preventDefault();
+    let data = [...columnLabel];
+    if (data[idx].id) {
+      let listColDel = [...listColDelete];
+      listColDel.push(data[idx]);
+      setListColDelete(listColDel);
+    }
+    let datafilter = data.filter((_item, index) => {
+      if (index !== idx) {
+        return true;
+      }
+      return false;
+    });
+    setColumnLabel(datafilter);
   };
 
   return (
     <>
-      {/* {props.stt}.{title} */}
       {props.isEdit ? (
         <div>
-          {/* <div>
-            <Input
-              style={{ marginBottom: "10px" }}
+          <div style={{ marginTop: '5px' }}>
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+              style={{ marginBottom: "10px", height: '38px' }}
               type="text"
               onChange={handleChangeTextbox}
               defaultValue={title}
             />
-          </div> */}
-          <label>Row label</label>
-          {rowLabel.map((e, i) => {
+          </div>
+          <label style={{ marginLeft: '15px' }}>Nhãn hàng</label>
+          {rowLabel.map((item, idx) => {
             return (
-              <div key={i}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  onChange={(evn) => handleChangeTextboxRowLabel(e.id, evn)}
-                  defaultValue={e.content}
+              <div key={`$row-${item.unique}`} style={{ marginBottom: '7px' }}>
+                {idx + 1}.<Input
+                  style={{ width: "80%", marginRight: "10px" }}
+                  onChange={(e) => handleChangeTextboxRowLabel(e, idx)}
+                  defaultValue={item.title}
                 />
                 <AddCircleOutlineIcon
                   style={{ cursor: "pointer" }}
                   onClick={addRowLabel}
                 />
+                {rowLabel.length > 1 && (
+                  <RemoveCircleOutline
+                    style={{ cursor: "pointer" }}
+                    onClick={(e) => removeRowLabel(e, idx)}
+                  />
+                )}
               </div>
             );
           })}
-          <label>Columns label</label>
-          {columnLabel.map((e, i) => {
+          <label style={{ marginLeft: '15px' }}>Nhãn cột</label>
+          {columnLabel.map((item, idx) => {
             return (
-              <div key={i}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  defaultValue={e.content}
-                  onChange={(evn) => handleChangeTextboxColumnLabel(e.id, evn)}
+              <div key={`$col-${item.unique}`} style={{ marginBottom: '7px' }}>
+                {idx + 1}. <Input
+                  style={{ width: "80%", marginRight: "10px" }}
+                  defaultValue={item.title}
+                  onChange={(e) => handleChangeTextboxColumnLabel(e, idx)}
                 />
                 <AddCircleOutlineIcon
                   style={{ cursor: "pointer" }}
                   onClick={addColumnLabel}
                 />
+                {columnLabel.length > 1 && (
+                  <RemoveCircleOutline
+                    style={{ cursor: "pointer" }}
+                    onClick={(e) => removeColumnLabel(e, idx)}
+                  />
+                )}
               </div>
             );
           })}
-          <div style={{ marginTop: "10px" }}>
+          <div style={{ marginTop: "10px", marginLeft: '15px' }}>
             <Button
               style={{ marginRight: '5px' }}
               size="small"
               onClick={handleCancelGridTextbox}
             >
-              Cancel
+              Hủy bỏ
             </Button>
             <Button
               type="primary"
@@ -182,14 +253,14 @@ const GridTextbox = (props) => {
         </div>
       ) : (
           <>
-            Câu {props.stt + 1}. {title}.
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
             <div onClick={props.onEdit} style={{ cursor: "pointer" }}>
               <table>
                 <thead>
                   <tr>
                     <th></th>
                     {columnLabel.map((e, i) => {
-                      return <th key={i}>{e.content}</th>;
+                      return <th key={i} style={{ margin: 'auto', textAlign: 'center', border: 'solid', borderWidth: 'thin' }} className='th-table-question-view'>{e.title}</th>;
                     })}
                   </tr>
                 </thead>
@@ -197,10 +268,10 @@ const GridTextbox = (props) => {
                   {rowLabel.map((e, i) => {
                     return (
                       <tr key={i}>
-                        <td>{e.content}</td>
+                        <td className='td-table-create-question'>{e.title}</td>
                         {columnLabel.map((e, i) => {
                           return (
-                            <td key={i}>
+                            <td key={i} style={{ margin: 'auto', textAlign: 'center', border: 'solid', borderWidth: 'thin' }}>
                               <Input />
                             </td>
                           );

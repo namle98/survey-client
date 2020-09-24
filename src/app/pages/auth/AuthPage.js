@@ -24,10 +24,10 @@ export default function AuthPage() {
             >
               <div className="kt-grid__item">
                 <Link to="/" className="kt-login__logo">
-                  <img
+                  {/* <img
                     alt="Logo"
                     src={toAbsoluteUrl("/images/survey.png")}
-                  />
+                  /> */}
                 </Link>
               </div>
               {/* <div className="kt-grid__item">

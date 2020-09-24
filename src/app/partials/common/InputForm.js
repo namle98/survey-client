@@ -5,11 +5,13 @@ const InputForm = (props) => {
 
     const inputRef = useRef();
 
-    useEffect(() => {
-        if (props.focus) {
-            inputRef.current.focus();
-        }
-    }, []);
+    const componentDidMount = () => {
+      if (props.focus) {
+        inputRef.current.focus();
+      }
+    }
+
+    useEffect(componentDidMount, []);
 
     return <input
         type={props.type || "text"}

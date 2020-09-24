@@ -1,28 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Radio, Button, Input } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { connect } from "react-redux";
-import * as actions from './../../store/actions/index';
+import { updateMultiForm } from "./../../libs/utils";
+import * as actions from "./../../store/actions/index";
 
 let indexRow = 4;
 let indexColumn = 3;
 const GridSingleChoise = (props) => {
+	const updateTitle = props.dataUpdate
+		? props.dataUpdate.title
+		: "Do you have any other comments, questions, or concerns?";
+
+	const { updateColumLabel, updateRowLabel } = updateMultiForm(
+		props.dataUpdate
+			? props.dataUpdate.question_columns
+				? props.dataUpdate.question_columns
+				: null
+			: null,
+		props.dataUpdate
+			? props.dataUpdate.question_row
+				? props.dataUpdate.question_row
+				: null
+			: null,
+		[
+			{ id: 1, content: "columnLabel 1" },
+			{ id: 2, content: "columnLabel 2" },
+		],
+		[
+			{ id: 1, content: "rowlabel 1" },
+			{ id: 2, content: "rowlabel 2" },
+			{ id: 3, content: "rowlabel 3" },
+		]
+	);
+	const [title, setTitle] = useState(updateTitle);
+	const [rowLabel, setRowLabel] = useState(updateRowLabel);
+	const [columnLabel, setColumnLabel] = useState(updateColumLabel);
+
+	useEffect(() => {
+		setTitle(updateTitle);
+		setRowLabel(updateRowLabel);
+		setColumnLabel(updateColumLabel);
+		props.onStateAdded({
+			dataRow: updateRowLabel,
+			dataColumn: updateColumLabel,
+			title: updateTitle,
+		});
+	}, [updateTitle]);
+
 	const [isEdit, setEdit] = useState(false);
 	const [preTitle, setPreTitle] = useState();
 	const [preRowLabel, setPreRowLabel] = useState();
 	const [preColumnLabel, setPreColumnLabel] = useState();
-	const [title, setTitle] = useState(
-		"Do you have any other comments, questions, or concerns?"
-	);
-	const [rowLabel, setRowLabel] = useState([
-		{ id: 1, content: "rowlabel 1" },
-		{ id: 2, content: "rowlabel 2" },
-		{ id: 3, content: "rowlabel 3" },
-	]);
-	const [columnLabel, setColumnLabel] = useState([
-		{ id: 1, content: "columnLabel 1" },
-		{ id: 2, content: "columnLabel 2" },
-	]);
 
 	const handleChange = (e) => {
 		e.preventDefault();
@@ -129,7 +158,7 @@ const GridSingleChoise = (props) => {
 						return (
 							<div key={i}>
 								<Input
-									style={{ width: "70%", marginRight: "10px" }}
+									style={{ width: "80%", marginRight: "10px" }}
 									onChange={(e) => handleChangeRowLabel(e, item.id)}
 									defaultValue={item.content}
 								/>
@@ -146,12 +175,12 @@ const GridSingleChoise = (props) => {
 							</div>
 						);
 					})}
-					<label>Columns label</label>
+					<label>Tiêu đề cột</label>
 					{columnLabel.map((item, idx) => {
 						return (
 							<div key={idx}>
 								<Input
-									style={{ width: "70%", marginRight: "10px" }}
+									style={{ width: "80%", marginRight: "10px" }}
 									defaultValue={item.content}
 									onChange={(e) => handleChangeColumnLabel(e, item.id)}
 								/>
@@ -170,17 +199,13 @@ const GridSingleChoise = (props) => {
 					})}
 					<div>
 						<Button
-							style={{marginRight: '5px'}}
+							style={{ marginRight: "5px" }}
 							size="small"
 							onClick={(e) => onClickCancel(e)}
 						>
 							Cancel
 						</Button>
-						<Button
-							type="primary"
-							size="small"
-							onClick={(e) => onClickSave(e)}
-						>
+						<Button type="primary" size="small" onClick={(e) => onClickSave(e)}>
 							Save
 						</Button>
 					</div>

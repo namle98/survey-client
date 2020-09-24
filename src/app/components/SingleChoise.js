@@ -1,26 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Input, Radio } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
-
-let indexRow = 4;
-let currentRowLabel = [];
+import { RADIO, SINGLE_CHOISE } from '../config/common/TypeOfInput';
+import { generateRandomCode } from '../libs/random';
 
 const SingleChoise = (props) => {
-  const [isEdit, setEdit] = useState(false);
-  const [choise, setChoise] = useState("");
-  const [preTitle, setPreTitle] = useState();
-  const [preRowLabel, setPreRowLabel] = useState();
+
+  const [currentRowLabel, setCurrentRowLabel] = useState([]);
+  const [preTitle, setPreTitle] = useState('');
   const [title, setTitle] = useState(
-    "Do you have any other comments, questions, or concerns?"
+    props.title
   );
+  const [listDelete, setListDelete] = useState([]);
 
   const [rowLabel, setRowLabel] = useState([
-    { id: 1, content: "rowlabel 1" },
-    { id: 2, content: "rowlabel 2" },
-    { id: 3, content: "rowlabel 3" },
+    { title: "Nội dung hàng 1", unique: 'abcdefgh' },
+    { title: "Nội dung hàng 2", unique: 'iklmnopq' },
+    { title: "Nội dung hàng 3", unique: 'rstuvxyz' },
   ]);
 
-  let data = {
+  let objSingleChoise = {
     id: props.id,
     title: title,
     note: "",
@@ -28,63 +27,90 @@ const SingleChoise = (props) => {
     have_child: false,
     index: 1,
     type: 1, //1 là bình thường, 2 là mẫu
-    input_type_id: props.type, // 4 là dạng multi select....
+    input_type_id: SINGLE_CHOISE, // 4 là dạng multi select....
     question_choise: [],
   };
 
-  let question = {};
+  const componentDidMount = () => {
+    if (props.item && props.item.question_choise) {
+      let rowItem = props.item.question_choise.map(item => {
+        return {
+          id: item.id,
+          title: item.title
+        }
+      });
+      setCurrentRowLabel([...rowItem]);
+      setRowLabel(rowItem);
+    } else {
+      setCurrentRowLabel(rowLabel);
+    }
+  }
+
+  useEffect(componentDidMount, []);
 
   const handleChange = (e) => {
+    e = window.event || e;
     e.preventDefault();
     setPreTitle(e.target.value);
   };
 
-  const handleChangeRowLabel = (e, id) => {
+  const handleChangeRowLabel = (e, idx) => {
     e = window.event || e;
     e.preventDefault();
-
     let row = [...rowLabel];
-    let objUpdate = row.findIndex((item) => item.id === id);
-    row[objUpdate].content = e.target.value;
+    row[idx].title = e.target.value;
     setRowLabel(row);
   };
 
   const addRowLabel = () => {
-    let id = indexRow++;
-    let content = "";
+    let unique = generateRandomCode(6);
+    let title = "";
     let data = [...rowLabel];
-    currentRowLabel = [...rowLabel];
-    data.push({ id, content });
+    setCurrentRowLabel([...rowLabel]);
+    data.push({ title, unique });
     setRowLabel(data);
   };
 
-  const removeRowLabel = (e, id) => {
+  const removeRowLabel = (e, idx) => {
     e.preventDefault();
     let data = [...rowLabel];
-    data = data.filter((item) => item.id !== id);
-    setRowLabel(data);
+    if (data[idx].id) {
+      let delItem = data[idx];
+      let listDel = [...listDelete];
+      listDel.push(delItem);
+      setListDelete(listDel);
+    }
+    let datafilter = data.filter((_item, index) => {
+      if (index !== idx) {
+        return true;
+      }
+      return false;
+    });
+    setRowLabel(datafilter);
   };
 
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    currentRowLabel = [...rowLabel];
-    currentRowLabel.map((e, i) => {
-      question.title = e.content;
-      question.type = 2;
+    setCurrentRowLabel([...rowLabel]);
+    rowLabel.forEach((e, i) => {
+      let question = {};
+      question.id = e.id || '';
+      question.title = e.title;
+      question.type = RADIO;
       question.index = i;
-      data.question_choise.push(question);
-      question = {};
+      question.input_type_id = SINGLE_CHOISE;
+      objSingleChoise.question_choise.push(question);
     });
+
+    objSingleChoise.delete_choises = listDelete;
+
     if (preTitle !== "") {
       setTitle(preTitle);
+      objSingleChoise.title = preTitle;
     }
     props.onCancel();
-    props.getDataSection(data);
-  };
-
-  const onChangeChoise = (value) => {
-    setChoise(value);
+    props.getDataSection(objSingleChoise);
   };
 
   const editHandle = (e) => {
@@ -103,22 +129,22 @@ const SingleChoise = (props) => {
     <>
       {props.isEdit ? (
         <div>
-          <div>
-            <Input
-              style={{ marginBottom: "10px" }}
+          <div style={{ marginTop: '5px' }}>
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+              style={{ marginBottom: "10px", height: '38px' }}
               type="text"
               onChange={handleChange}
               defaultValue={title}
             />
           </div>
-          <label>Row label</label>
-          {rowLabel.map((item, i) => {
+          <label style={{ marginLeft: '15px' }}>Nhãn hàng</label>
+          {rowLabel.map((item, idx) => {
             return (
-              <div key={i}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  onChange={(e) => handleChangeRowLabel(e, item.id)}
-                  defaultValue={item.content}
+              <div key={`$row-${item.unique}`} style={{ marginBottom: '7px' }}>
+                {idx + 1}. <Input
+                  style={{ width: "80%", marginRight: "10px" }}
+                  onChange={(e) => handleChangeRowLabel(e, idx)}
+                  defaultValue={item.title}
                 />
                 <AddCircleOutline
                   style={{ cursor: "pointer" }}
@@ -127,7 +153,7 @@ const SingleChoise = (props) => {
                 {rowLabel.length > 1 && (
                   <RemoveCircleOutline
                     style={{ cursor: "pointer" }}
-                    onClick={(e) => removeRowLabel(e, item.id)}
+                    onClick={(e) => removeRowLabel(e, idx)}
                   />
                 )}
               </div>
@@ -135,7 +161,7 @@ const SingleChoise = (props) => {
           })}
           <div style={{ marginTop: "10px" }}>
             <Button
-              style={{ marginRight: '5px' }}
+              style={{ marginRight: '5px', marginLeft: '15px' }}
               size="small"
               onClick={onClickCancel}
             >
@@ -152,22 +178,17 @@ const SingleChoise = (props) => {
         </div>
       ) : (
           <>
-            Câu {props.stt + 1}. {title}.
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
             <div onClick={editHandle} style={{ cursor: "pointer" }}>
-              <Radio.Group
-                onChange={(e) => onChangeChoise(e.target.value)}
-                value={choise}
-              >
-                {rowLabel.map((item, i) => {
-                  return (
-                    <>
-                      <div key={i}>
-                        <Radio value={i}>{item.content}</Radio>
-                      </div>
-                    </>
-                  );
-                })}
-              </Radio.Group>
+              {rowLabel.map((item, i) => {
+                return (
+                  <>
+                    <div key={i} style={{ marginBottom: '7px' }}>
+                      <Radio /> {item.title}
+                    </div>
+                  </>
+                );
+              })}
             </div>
           </>
         )}

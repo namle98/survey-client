@@ -17,6 +17,7 @@ import Layout from "../../_metronic/layout/Layout";
 import * as routerHelpers from "../router/RouterHelpers";
 import AuthPage from "../pages/auth/AuthPage";
 import 'antd/dist/antd.css';
+import FormDetail from "../pages/form-detail/FormDetail";
 
 export const Routes = withRouter(({ history }) => {
   const lastLocation = useLastLocation();
@@ -30,10 +31,15 @@ export const Routes = withRouter(({ history }) => {
     shallowEqual
   );
 
+  //const formanswer = window.location.href.indexOf('formanswer');
+
   return (
     /* Create `LayoutContext` from current `history` and `menuConfig`. */
     <LayoutContextProvider history={history} menuConfig={menuConfig}>
       <Switch>
+
+        <Route path="/formanswer" component={FormDetail} />
+
         {!isAuthorized ? (
           /* Render auth page when user at `/auth` and not authorized. */
           <AuthPage />

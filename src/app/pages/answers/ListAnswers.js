@@ -1,339 +1,403 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
-// eslint-disable-next-line no-restricted-imports
+import Loading from "../loading";
+import { Form, Card } from "react-bootstrap";
+import InputForm from "../../partials/common/InputForm";
+import Icon from "@material-ui/core/Icon";
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
+	Paper,
+	Table,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
 } from "@material-ui/core";
 
-import { Modal, Pagination, Button } from "antd";
-import { Form } from "react-bootstrap";
-import InputForm from "../../partials/common/InputForm";
-import { Card, Col } from "react-bootstrap";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import Loading from "../loading";
+import { Modal, Pagination, Button, Select, Spin } from "antd";
 import ButtonLoading from "../../partials/common/ButtonLoading";
 import makeRequest from "../../libs/request";
-import { formatTime } from "../../libs/time";
-import { Select, Radio } from "antd";
 import ShowFormSurvey from "../form/ShowFormSurvey";
 const { Option } = Select;
 
 const useStyles1 = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-    marginTop: theme.spacing(3),
-    overflowX: "auto",
-  },
-  table: {
-    minWidth: 650,
-  },
+	root: {
+		width: "100%",
+		marginTop: theme.spacing(3),
+		overflowX: "auto",
+	},
+	table: {
+		minWidth: 650,
+	},
 }));
 
 const ListAnswers = (props) => {
-  const classes1 = useStyles1();
-  const rowsPerPage = 10;
-  const [page, setPage] = useState(1);
-  const [rows, setRow] = useState([]);
-  const [dataSearch, setData] = useState({});
-  const [dataDelete, setDataDelete] = useState({ visible: false });
-  const [total, setTotal] = useState(0);
-  const [isLoading, setLoading] = useState(true);
-  const [isLoadDelete, setLoadDelete] = useState(false);
-  const [showDetail, setShowDetail] = useState(false);
-  const [dataDetail, setDataDetail] = useState({});
+	const classes1 = useStyles1();
+	const rowsPerPage = 10;
+	const [page, setPage] = useState(1);
+	const [rows, setRow] = useState([]);
+	const [dataSearch, setDataSearch] = useState({});
+	const [dataDelete, setDataDelete] = useState({ visible: false });
+	const [total, setTotal] = useState(0);
+	const [isLoading, setLoading] = useState(true);
+	const [isLoadDelete, setLoadDelete] = useState(false);
+	const [showDetail, setShowDetail] = useState(false);
+	const [dataDetail, setDataDetail] = useState({});
+	const [isSearchRound, setIsSearchRound] = useState(false);
+	const [listRound, setListRound] = useState([]);
+	const [textSearch, setTextSearch] = useState('');
+	const [isSearchForm, setIsSearchForm] = useState(false);
+	const [listForm, setListForm] = useState([]);
+	const [textSearchForm, setTextSearchForm] = useState('');
 
-  let fakeData = [
-    {
-      id: 1,
-      answer_text: "adfkasdhfjashdfkashdfk",
-      user_id: 1,
-      organization_id: 1,
-    },
-    {
-      id: 2,
-      answer_text: "ádfhaskdjfhaksjd",
-      user_id: 1,
-      organization_id: 2,
-    },
-    {
-      id: 3,
-      answer_text: "á dfkhasld ádfsahdfkjasd",
-      user_id: 3,
-      organization_id: 1,
-    },
-  ];
+	useEffect(() => {
+		getRoundNewest();
+	}, []);
 
-  useEffect(() => {
-    searchanization({ page: 1, limit: rowsPerPage });
-  }, []);
+	function itemRender(originalElement) {
+		return originalElement;
+	}
+	const handleChangePage = (newPage) => {
+		setPage(newPage);
+		searchUserForm({ ...dataSearch, page: newPage, limit: rowsPerPage });
+	};
+	const searchUserForm = (dataSearch = {}) => {
+		setLoading(true);
+		makeRequest("get", `userform/getAll`, dataSearch)
+			.then(({ data }) => {
+				if (data.signal) {
+					const { count } = data.data;
+					const { rows } = data.data.rows;
+					setRow(rows);
+					setTotal(count);
+				}
+				setLoading(false);
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+			});
+	};
 
-  function itemRender(current, type, originalElement) {
-    return originalElement;
-  }
+	const hideDeleteModal = () => {
+		setDataDelete({
+			...dataDelete,
+			visible: false,
+			idDel: 0,
+		});
+	};
 
-  const searchanization = (dataSearch = {}) => {
-    setLoading(true);
-    setTimeout(() => {
-      setRow(fakeData);
-    }, 1000);
-    setLoading(false);
-  };
+	const deleteAction = (id) => {
+		setLoadDelete(true);
+		hideDeleteModal();
+		setLoadDelete(false);
+	};
 
-  const handleChangePage = (newPage) => {
-    setPage(newPage);
-    searchanization({ ...dataSearch, page: newPage, limit: rowsPerPage });
-  };
+	const detailAnswer = (row) => {
+		setShowDetail(true);
+		setDataDetail(row);
+	};
 
-  const onChangeValue = (key, value) => {
-    setData({
-      ...dataSearch,
-      [key]: value,
-    });
-  };
+	const searchSurveyRound = (value) => {
+		setListRound([]);
+		setIsSearchRound(true);
+		makeRequest("get", `surveyrounds/searchSurRounds`, {
+			title: value,
+			limit: 10,
+		})
+			.then(({ data }) => {
+				if (data.signal) {
+					let arrSurRound = data.data.rows.map((it) => {
+						return {
+							label: `${it.title}`,
+							value: it.id,
+						};
+					});
 
-  const hideDeleteModal = () => {
-    setDataDelete({
-      ...dataDelete,
-      visible: false,
-      idDel: 0,
-    });
-  };
+					setListRound(arrSurRound);
+					setIsSearchRound(false);
+					setTextSearch(value);
+				}
+			})
+			.catch((err) => {
+				console.log("++++++++++++++++", err);
+			});
+	};
 
-  const deleteAction = (id) => {
-    setLoadDelete(true);
-    hideDeleteModal();
-    setLoadDelete(false);
-  };
+	const searchForm = (value) => {
+		setListForm([]);
+		setIsSearchForm(true);
+		makeRequest("get", `organization/search`, {
+			id: value,
+			limit: 10,
+		})
+			.then(({ data }) => {
+				if (data.signal) {
+					let arrForm = data.data.rows.map((it) => {
+						return {
+							label: `${it.title}`,
+							value: it.id,
+						};
+					});
 
-  const showModalDelete = (id) => {
-    setDataDelete({
-      id,
-      visible: true,
-    });
-  };
+					setListForm(arrForm);
+					setIsSearchForm(false);
+					setTextSearchForm(value);
+				}
+			})
+			.catch((err) => {
+				console.log("++++++++++++++++", err);
+			});
+	};
 
-  const unfilteredData = (e) => {
-    setData({});
-    setPage(1);
-    searchanization({ page: 1, limit: rowsPerPage });
-  };
+	const onChangeSurveyRound = (value) => {
+		setDataSearch({
+			...dataSearch,
+			survey_round_id: value,
+			form_id: ''
+		});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setPage(1);
-    searchanization({ ...dataSearch, page: 1, limit: rowsPerPage });
-  };
+		searchUserForm({ survey_round_id: value, page: 1, limit: rowsPerPage });
+	};
 
-  const detailOrganization = (row) => {
-    setShowDetail(true);
-    setDataDetail(row);
-  };
+	const onChangeForm = (value) => {
+		setDataSearch({
+			...dataSearch,
+			form_id: value
+		});
 
-  return (
-    <>
-      <Link
-        to="/form/add"
-        className="btn btn-primary btn-bold btn-sm btn-icon-h kt-margin-l-10"
-      >
-        Tạo form
-      </Link>
+		searchUserForm({ survey_round_id: dataSearch.survey_round_id, form_id: value, page: 1, limit: rowsPerPage });
+	};
 
-      <div className="row">
-        <div className="col-md-12">
-          <div className="kt-section">
-            <div className="kt-section__content">
-              <Paper className={classes1.root}>
-                <div className="col-md-12">
-                  <Form onSubmit={handleSubmit}>
-                    <div style={{ marginTop: 20, fontSize: 20 }}>
-                      <label>Tìm kiếm</label>
-                    </div>
-                    <div className="form-row">
-                      <div className="form-group col-md-2">
-                        <div className="form-group">
-                          <InputForm
-                            type="text"
-                            placeholder="Tên Answers"
-                            value={dataSearch.organization_name || ""}
-                            onChangeValue={(value) => {
-                              onChangeValue("organization_name", value);
-                            }}
-                            focus={true}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group col-md-3">
-                        <div className="form-group" style={{ display: "flex" }}>
-                          <button
-                            className="btn btn-label-primary btn-bold btn-sm btn-icon-h kt-margin-l-10"
-                            onClick={unfilteredData}
-                            style={{ marginLeft: 10, marginTop: 3 }}
-                            type="button"
-                          >
-                            <span>Bỏ lọc</span>
-                          </button>
+	const unfilteredData = (e) => {
+		setDataSearch({});
+		setPage(1);
+		searchUserForm({ page: 1, limit: rowsPerPage });
+	};
 
-                          <ButtonLoading
-                            type="submit"
-                            className="btn btn-label-primary btn-bold btn-sm btn-icon-h kt-margin-l-10"
-                            loading={isLoading}
-                            style={{ marginLeft: 10, marginTop: 3 }}
-                          >
-                            <span>Tìm kiếm</span>
-                          </ButtonLoading>
-                        </div>
-                      </div>
-                    </div>
-                  </Form>
-                </div>
-                {isLoading ? (
-                  <Loading />
-                ) : (
-                  <Table className={classes1.table}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Tên Answers</TableCell>
-                        <TableCell>Code</TableCell>
-                        <TableCell style={{ width: 150 }}>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows && rows.length ? (
-                        rows.map((row, key) => (
-                          <TableRow key={`organization-${key}`}>
-                            <TableCell>{row.answer_text}</TableCell>
-                            <TableCell>{row.organization_id}</TableCell>
-                            <TableCell>
-                              <div className="mg-b5">
-                                <Button
-                                  type="primary"
-                                  size="small"
-                                  className="button-center-item "
-                                  onClick={() => {
-                                    detailOrganization(row);
-                                  }}
-                                  icon={<InfoCircleOutlined />}
-                                >
-                                  Chi tiết
-                                </Button>
-                              </div>
-                              <div className="mg-b5">
-                                <Button
-                                  type="primary"
-                                  size="small"
-                                  className="button-center-item btn-success"
-                                  style={{ color: "white" }}
-                                  onClick={() =>
-                                    props.history.push(`/form/update/${row.id}`)
-                                  }
-                                  icon={<InfoCircleOutlined />}
-                                >
-                                  Cập nhật
-                                </Button>
-                              </div>
-                              <div className="mg-b5">
-                                <Button
-                                  type="primary"
-                                  size="small"
-                                  className="button-center-item btn-danger"
-                                  style={{ color: "white" }}
-                                  onClick={() => showModalDelete(row.id)}
-                                  icon={<InfoCircleOutlined />}
-                                >
-                                  Xóa
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={10} align="center">
-                            Không có dữ liệu
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                )}
-                {total > rowsPerPage && (
-                  <div className="custom-svg customSelector">
-                    <Pagination
-                      itemRender={itemRender}
-                      className="pagination-crm"
-                      current={page}
-                      pageSize={rowsPerPage}
-                      total={total}
-                      onChange={(p, s) => handleChangePage(p)}
-                    />
-                  </div>
-                )}
-              </Paper>
-            </div>
-            <Modal
-              title="Xóa form"
-              visible={dataDelete.visible}
-              onOk={deleteAction}
-              onCancel={hideDeleteModal}
-              footer={[
-                <ButtonLoading
-                  type="default"
-                  onClick={hideDeleteModal}
-                  className="btn btn-label-secondary btn-secondary"
-                >
-                  Đóng
-                </ButtonLoading>,
-                <ButtonLoading
-                  className="btn btn-label-danger btn-danger"
-                  onClick={deleteAction}
-                  loading={isLoadDelete}
-                >
-                  <span>Xóa</span>
-                </ButtonLoading>,
-              ]}
-            >
-              <p>Bạn có muốn xóa câu trả lời này</p>
-            </Modal>
-            <Modal
-              title="Chi tiết answers"
-              visible={showDetail}
-              width={600}
-              onCancel={() => setShowDetail(false)}
-              footer={[
-                <Button type="primary" onClick={() => setShowDetail(false)}>
-                  OK
-                </Button>,
-              ]}
-            >
-              <div
-                className="form-group"
-                style={{
-                  height: "300px",
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                }}
-              >
-                <Card>
-                  <ShowFormSurvey data={dataDetail} />
-                </Card>
-              </div>
-            </Modal>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+	const getRoundNewest = () => {
+		setListRound([]);
+		makeRequest('get', 'surveyrounds/getNewest').then(({ data }) => {
+			if (data.signal) {
+				console.log('data', data.data)
+				setDataSearch({
+					...dataSearch,
+					survey_round_id: data.data.id
+				})
+				setListRound([{ value: data.data.id, label: data.data.title }])
+				searchUserForm({ survey_round_id: data.data.id, limit: 10, page: 1 });
+			}
+		})
+	}
+
+	return (
+		<>
+			<div className="row">
+				<div className="col-md-12">
+					<div className="kt-section">
+						<div className="kt-section__content">
+							<Paper className={classes1.root}>
+								<div className="col-md-12">
+									<Form>
+										<div style={{ marginTop: 20, fontSize: 20 }}>
+											<label>Tìm kiếm</label>
+										</div>
+										<div className="form-row">
+											<div className="form-group col-md-2">
+												<div className="form-group">
+													<Select
+														showSearch
+														value={dataSearch.survey_round_id || "Nhập tên đợt"}
+														notFoundContent={
+															isSearchRound ? (
+																<Spin size="small" />
+															) : textSearch ? (
+																"Không có dữ liệu"
+															) : null
+														}
+														filterOption={false}
+														onSearch={searchSurveyRound}
+														onChange={onChangeSurveyRound}
+														style={{ width: "100%" }}
+													>
+														{listRound.map((u) => (
+															<Option
+																key={`child-distri-${u.value}`}
+																value={u.value}
+															>
+																{u.label}
+															</Option>
+														))}
+													</Select>
+												</div>
+											</div>
+											{dataSearch.survey_round_id && <div className="form-group col-md-2">
+												<div className="form-group">
+													<Select
+														showSearch
+														value={dataSearch.form_id || "Nhập tên form"}
+														notFoundContent={
+															isSearchForm ? (
+																<Spin size="small" />
+															) : textSearchForm ? (
+																"Không có dữ liệu"
+															) : null
+														}
+														filterOption={false}
+														onSearch={searchForm}
+														onChange={onChangeForm}
+														style={{ width: "100%" }}
+													>
+														{listForm.map((u) => (
+															<Option
+																key={`child-distri-${u.value}`}
+																value={u.value}
+															>
+																{u.label}
+															</Option>
+														))}
+													</Select>
+												</div>
+											</div>}
+											{dataSearch.form_id && <div className="form-group col-md-2">
+												<div className="form-group">
+													<InputForm
+														type="text"
+														placeholder="Nhập tên người tham gia"
+														value={dataSearch.name || ""}
+														focus={true}
+													/>
+												</div>
+											</div>}
+											<div className="form-group col-md-3">
+												<div className="form-group" style={{ display: "flex" }}>
+													<button
+														className="btn btn-label-primary btn-bold btn-sm btn-icon-h kt-margin-l-10"
+														onClick={unfilteredData}
+														style={{ marginLeft: 10, marginTop: 3 }}
+														type="button"
+													>
+														<span>Bỏ lọc</span>
+													</button>
+
+													<ButtonLoading
+														type="submit"
+														className="btn btn-label-primary btn-bold btn-sm btn-icon-h kt-margin-l-10"
+														loading={isLoading}
+														style={{ marginLeft: 10, marginTop: 3 }}
+													>
+														<span>Tìm kiếm</span>
+													</ButtonLoading>
+												</div>
+											</div>
+										</div>
+									</Form>
+								</div>
+								{isLoading ? (
+									<Loading />
+								) : (
+										<Table className={classes1.table}>
+											<TableHead>
+												<TableRow>
+													<TableCell>Tên người trả lời </TableCell>
+													<TableCell>Đợt khảo sát </TableCell>
+													<TableCell>Form </TableCell>
+													<TableCell style={{ width: 150 }}>Action</TableCell>
+												</TableRow>
+											</TableHead>
+											<TableBody>
+												{rows && rows.length ? (
+													rows.map((row, key) => (
+														<TableRow key={`answers-${key}`}>
+															<TableCell>{row.users.name}</TableCell>
+															<TableCell>
+																{row.survey_round && row.survey_round.title}
+															</TableCell>
+															<TableCell>
+																{row.organization && row.organization.title}
+															</TableCell>
+															<TableCell>
+																<div className="mg-b5">
+																	<span
+																		style={{ cursor: "pointer" }}
+																		d
+																		data-toggle="tooltip"
+																		data-placement="top"
+																		title="Xem chi tiết"
+																	>
+																		<Icon
+																			className="fa fa-file"
+																			onClick={(e) => {
+																				detailAnswer(e, row.id);
+																			}}
+																			style={{
+																				color: "#0000ff",
+																				fontSize: 15,
+																				marginLeft: 15,
+																			}}
+																		/>
+																	</span>
+																</div>
+															</TableCell>
+														</TableRow>
+													))
+												) : (
+														<TableRow>
+															<TableCell colSpan={10} align="center">
+																Không có dữ liệu
+													</TableCell>
+														</TableRow>
+													)}
+											</TableBody>
+										</Table>
+									)}
+								{total > rowsPerPage && (
+									<div className="custom-svg customSelector">
+										<Pagination
+											itemRender={itemRender}
+											className="pagination-crm"
+											current={page}
+											pageSize={rowsPerPage}
+											total={total}
+											onChange={(p, s) => handleChangePage(p)}
+										/>
+									</div>
+								)}
+							</Paper>
+						</div>
+						<Modal
+							title="Chi tiết answers"
+							visible={showDetail}
+							width={600}
+							onCancel={() => setShowDetail(false)}
+							footer={[
+								<Button type="primary" onClick={() => setShowDetail(false)}>
+									OK
+								</Button>,
+							]}
+						>
+							<div
+								className="form-group"
+								style={{
+									height: "300px",
+									overflowY: "auto",
+									overflowX: "hidden",
+								}}
+							>
+								<Card>
+									<ShowFormSurvey data={dataDetail} />
+								</Card>
+							</div>
+						</Modal>
+					</div>
+				</div>
+			</div>
+		</>
+	);
 };
 
 const mapStateToProps = ({ auth }) => ({
-  user: auth.user,
+	user: auth.user,
 });
 
 export default connect(mapStateToProps, null)(ListAnswers);

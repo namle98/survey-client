@@ -1,254 +1,329 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Checkbox, Button, Input } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
-
-let indexRow = 4;
-let indexColumn = 4;
-let currentRowLabel = [];
-let currentColumnLabel = [];
+import { CHECKBOX, GRID_MULTI_CHOISE } from "../config/common/TypeOfInput";
+import "./QuestionItem.scss";
+import { generateRandomCode } from "../libs/random";
 
 const GridMultiChoise = (props) => {
-  const [isEdit, setEdit] = useState(false);
-  const [preTitle, setPreTitle] = useState();
-  const [title, setTitle] = useState(
-    "Do you have any other comments, questions, or concerns?"
-  );
-  const [rowLabel, setRowLabel] = useState([
-    { id: 1, content: "rowlabel 1" },
-    { id: 2, content: "rowlabel 2" },
-    { id: 3, content: "rowlabel 3" },
-  ]);
-  const [columnLabel, setColumnLabel] = useState([
-    { id: 1, content: "columnLabel 1" },
-    { id: 2, content: "columnLabel 2" },
-    { id: 3, content: "columnLabel 3" },
-  ]);
+	const [preTitle, setPreTitle] = useState("");
+	const [title, setTitle] = useState(props.title);
 
-  let data = {
-    id: "abcd-efgh-mlqt-xzyx_question_3",
-    title: title,
-    note: "",
-    parent_id: 0,
-    have_child: false,
-    index: 1,
-    type: 1, //1 là bình thường, 2 là mẫu
-    input_type_id: props.type, // 8 là table_string....
-    question_columns: [],
-    question_row: [],
-  };
+	const [currentRowLabel, setCurrentRowLabel] = useState([]);
+	const [currentColumnLabel, setCurrentColumnLabel] = useState([]);
+	const [listRowDelete, setListRowDelete] = useState([]);
+	const [listColDelete, setListColDelete] = useState([]);
 
-  let columns = {};
+	const [rowLabel, setRowLabel] = useState([
+		{ title: "Nội dung hàng 1", unique: "abcdefgh" },
+		{ title: "Nội dung hàng 2", unique: "iklmnopq" },
+		{ title: "Nội dung hàng 3", unique: "rstuvxyz" },
+	]);
+	const [columnLabel, setColumnLabel] = useState([
+		{ title: "Nội dung cột 1", type: CHECKBOX, unique: "abcdefgh" },
+		{ title: "Nội dung cột 2", type: CHECKBOX, unique: "iklmnopq" },
+		{ title: "Nội dung cột 3", type: CHECKBOX, unique: "rstuvxyz" },
+	]);
 
-  let row = {};
+	const componentDidMount = () => {
+		if (props.item && props.item.question_row) {
+			let rowItem = props.item.question_row.map((item) => {
+				return {
+					id: item.id,
+					title: item.title,
+				};
+			});
+			setCurrentRowLabel([...rowItem]);
+			setRowLabel(rowItem);
+		} else {
+			setCurrentRowLabel(rowLabel);
+		}
 
-  const handleChange = (e) => {
-    e.preventDefault();
-    setPreTitle(e.target.value);
-  };
+		if (props.item && props.item.question_columns) {
+			let columnItem = props.item.question_columns.map((item) => {
+				return {
+					id: item.id,
+					title: item.title,
+					type: item.type,
+				};
+			});
+			setCurrentColumnLabel([...columnItem]);
+			setColumnLabel(columnItem);
+		} else {
+			setCurrentColumnLabel(columnLabel);
+		}
+	};
 
-  const handleChangeRowLabel = (e, id) => {
-    e = window.event || e;
-    e.preventDefault();
+	useEffect(componentDidMount, []);
 
-    let row = [...rowLabel];
-    let objUpdate = row.findIndex((item) => item.id === id);
-    row[objUpdate].content = e.target.value;
-    setRowLabel(row);
-  };
+	let objGridMultiChoise = {
+		id: props.id || "",
+		title: title,
+		note: "",
+		parent_id: 0,
+		have_child: false,
+		index: 1,
+		type: 1, //1 là bình thường, 2 là mẫu
+		input_type_id: GRID_MULTI_CHOISE, // 8 là table_string....
+		question_columns: [],
+		question_row: [],
+	};
 
-  const handleChangeColumnLabel = (e, id) => {
-    e = window.event || e;
-    e.preventDefault();
+	const handleChange = (e) => {
+		e = window.event || e;
+		e.preventDefault();
+		setPreTitle(e.target.value);
+	};
 
-    let row = [...columnLabel];
-    let objUpdate = row.findIndex((item) => item.id === id);
-    row[objUpdate].content = e.target.value;
-    setColumnLabel(row);
-  };
+	const handleChangeRowLabel = (e, idx) => {
+		e = window.event || e;
+		e.preventDefault();
+		let rows = [...rowLabel];
+		rows[idx].title = e.target.value;
+		setRowLabel(rows);
+	};
 
-  const addRowLabel = () => {
-    let id = indexRow++;
-    let content = "";
-    let data = [...rowLabel];
-    currentRowLabel = [...rowLabel];
-    data.push({ id, content });
-    setRowLabel(data);
-  };
+	const handleChangeColumnLabel = (e, idx) => {
+		e = window.event || e;
+		e.preventDefault();
+		let columns = [...columnLabel];
+		columns[idx].title = e.target.value;
+		setColumnLabel(columns);
+	};
 
-  const addColumnLabel = () => {
-    let id = indexColumn++;
-    let content = "";
-    let data = [...columnLabel];
-    currentColumnLabel = [...columnLabel];
-    data.push({ id, content });
-    setColumnLabel(data);
-  };
+	const addRowLabel = () => {
+		let title = "";
+		let unique = generateRandomCode(6);
+		let data = [...rowLabel];
+		data.push({ title, unique });
+		setRowLabel(data);
+	};
 
-  const removeRowLabel = (e, id) => {
-    e.preventDefault();
-    let data = [...rowLabel];
-    data = data.filter((item) => item.id !== id);
-    setRowLabel(data);
-  };
+	const addColumnLabel = () => {
+		let title = "";
+		let unique = generateRandomCode(6);
+		let data = [...columnLabel];
+		let type = CHECKBOX;
+		data.push({ title, type, unique });
+		setColumnLabel(data);
+	};
 
-  const removeColumnLabel = (e, id) => {
-    e.preventDefault();
-    let data = [...columnLabel];
-    data = data.filter((item) => item.id !== id);
-    setColumnLabel(data);
-  };
+	const removeRowLabel = (e, idx) => {
+		e.preventDefault();
+		let data = [...rowLabel];
+		if (data[idx].id) {
+			let listRowDel = [...listRowDelete];
+			listRowDel.push(data[idx]);
+			setListRowDelete(listRowDel);
+		}
+		let datafilter = data.filter((_item, index) => {
+			if (index !== idx) {
+				return true;
+			}
+			return false;
+		});
+		setRowLabel(datafilter);
+	};
 
-  const onClickSave = (e) => {
-    e = window.event || e;
-    e.preventDefault();
-    currentColumnLabel = [...columnLabel];
-    currentRowLabel = [...rowLabel];
-    columnLabel.map((e, i) => {
-      columns.title = e.content;
-      columns.note = e.content;
-      columns.index = i;
-      data.question_columns.push(columns);
-      columns = {};
-    });
+	const removeColumnLabel = (e, idx) => {
+		e.preventDefault();
+		let data = [...columnLabel];
+		if (data[idx].id) {
+			let listColDel = [...listColDelete];
+			listColDel.push(data[idx]);
+			setListColDelete(listColDel);
+		}
+		let datafilter = data.filter((_item, index) => {
+			if (index !== idx) {
+				return true;
+			}
+			return false;
+		});
+		setColumnLabel(datafilter);
+	};
 
-    rowLabel.map((e, i) => {
-      row.note = e.content;
-      row.title = e.content;
-      data.question_row.push(row);
-      row = {};
-    });
-    if (preTitle !== "") {
-      setTitle(preTitle);
-    }
-    props.onCancel();
-    props.getDataSection(data);
-  };
+	const onClickSave = (e) => {
+		e = window.event || e;
+		e.preventDefault();
+		setCurrentColumnLabel([...columnLabel]);
+		setCurrentRowLabel([...rowLabel]);
 
-  const editHandle = (e) => {
-    e = window.event || e;
-    props.onEdit();
-  };
+		columnLabel.forEach((e, i) => {
+			let column = {};
+			column.id = e.id || "";
+			column.title = e.title;
+			column.note = e.note;
+			column.type = e.type;
+			column.index = i;
+			objGridMultiChoise.question_columns.push(column);
+		});
 
-  const onClickCancel = (e) => {
-    e = window.event || e;
-    e.preventDefault();
-    setRowLabel(currentRowLabel);
-    setColumnLabel(currentColumnLabel);
-    props.onCancel();
-  };
+		objGridMultiChoise.delete_cols = listColDelete;
 
-  const onEdit = () => {
-    setEdit(true);
-  };
+		currentRowLabel.forEach((e) => {
+			let row = {};
+			row.id = e.id || "";
+			row.note = e.title;
+			row.title = e.title;
+			objGridMultiChoise.question_row.push(row);
+		});
 
-  return (
-    <>
-      {props.isEdit ? (
-        <div>
-          <div>
-            <Input
-              style={{ marginBottom: "10px" }}
-              type="text"
-              onChange={handleChange}
-              defaultValue={title}
-            />
-          </div>
-          <label>Row label</label>
-          {rowLabel.map((item, i) => {
-            return (
-              <div key={i}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  onChange={(e) => handleChangeRowLabel(e, item.id)}
-                  defaultValue={item.content}
-                />
-                <AddCircleOutline
-                  style={{ cursor: "pointer" }}
-                  onClick={addRowLabel}
-                />
-                {rowLabel.length > 1 && (
-                  <RemoveCircleOutline
-                    style={{ cursor: "pointer" }}
-                    onClick={(e) => removeRowLabel(e, item.id)}
-                  />
-                )}
-              </div>
-            );
-          })}
-          <label>Columns label</label>
-          {columnLabel.map((item, idx) => {
-            return (
-              <div key={idx}>
-                <Input
-                  style={{ width: "70%", marginRight: "10px" }}
-                  defaultValue={item.content}
-                  onChange={(e) => handleChangeColumnLabel(e, item.id)}
-                />
-                <AddCircleOutline
-                  style={{ cursor: "pointer" }}
-                  onClick={(e) => addColumnLabel(e)}
-                />
-                {columnLabel.length > 1 && (
-                  <RemoveCircleOutline
-                    style={{ cursor: "pointer" }}
-                    onClick={(e) => removeColumnLabel(e, item.id)}
-                  />
-                )}
-              </div>
-            );
-          })}
-          <div style={{ marginTop: "10px" }}>
-            <Button
-              style={{ paddingRight: '5px ' }}
-              size="small"
-              onClick={onClickCancel}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              size="small"
-              onClick={onClickSave}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
-      ) : (
-          <>
-            Câu {props.stt + 1}. {title}
-            <div onClick={editHandle} style={{ cursor: "pointer" }}>
-              <table>
-                <thead>
-                  <tr>
-                    <th></th>
-                    {columnLabel.map((e, i) => {
-                      return <th key={i}>{e.content}</th>;
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rowLabel.map((item, i) => {
-                    return (
-                      <tr key={i}>
-                        <td>{item.content}</td>
-                        {columnLabel.map((sub, i) => {
-                          return (
-                            <td key={i}>
-                              <Checkbox />
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-    </>
-  );
+		objGridMultiChoise.delete_rows = listRowDelete;
+
+		if (preTitle !== "") {
+			setTitle(preTitle);
+			objGridMultiChoise.title = preTitle;
+		}
+
+		props.onCancel();
+		props.getDataSection(objGridMultiChoise);
+	};
+
+	const editHandle = (e) => {
+		e = window.event || e;
+		props.onEdit();
+	};
+
+	const onClickCancel = (e) => {
+		e = window.event || e;
+		e.preventDefault();
+		setRowLabel(currentRowLabel);
+		setColumnLabel(currentColumnLabel);
+		props.onCancel();
+	};
+
+	return (
+		<>
+			{props.isEdit ? (
+				<div>
+					<div>
+						<p className="title-question">
+							Câu {props.stt + 1}. {title}
+						</p>{" "}
+						<Input
+							style={{ marginBottom: "10px", height: "38px" }}
+							type="text"
+							onChange={handleChange}
+							defaultValue={title}
+						/>
+					</div>
+					<label>Nhãn hàng</label>
+					{rowLabel.map((item, idx) => {
+						return (
+							<div key={`$row-${item.unique}`} style={{ marginBottom: "7px" }}>
+								{idx + 1}.{" "}
+								<Input
+									style={{ width: "80%", marginRight: "10px" }}
+									onChange={(e) => handleChangeRowLabel(e, idx)}
+									defaultValue={item.title}
+								/>
+								<AddCircleOutline
+									style={{ cursor: "pointer" }}
+									onClick={addRowLabel}
+								/>
+								{rowLabel.length > 1 && (
+									<RemoveCircleOutline
+										style={{ cursor: "pointer" }}
+										onClick={(e) => removeRowLabel(e, idx)}
+									/>
+								)}
+							</div>
+						);
+					})}
+
+					<label style={{ marginLeft: "15px" }}>Nhãn cột</label>
+
+					{columnLabel.map((item, idx) => {
+						return (
+							<div
+								key={`$col-${item.unique}`}
+								style={{ marginBottom: "7px", marginTop: "5px" }}
+							>
+								{idx + 1}.{" "}
+								<Input
+									style={{ width: "80%", marginRight: "10px" }}
+									defaultValue={item.title}
+									onChange={(e) => handleChangeColumnLabel(e, idx)}
+								/>
+								<AddCircleOutline
+									style={{ cursor: "pointer" }}
+									onClick={(e) => addColumnLabel()}
+								/>
+								{columnLabel.length > 1 && (
+									<RemoveCircleOutline
+										style={{ cursor: "pointer" }}
+										onClick={(e) => removeColumnLabel(e, idx)}
+									/>
+								)}
+							</div>
+						);
+					})}
+
+					<div style={{ marginTop: "10px", marginLeft: "15px" }}>
+						<Button
+							style={{ marginRight: "5px " }}
+							size="small"
+							onClick={onClickCancel}
+						>
+							Cancel
+						</Button>
+						<Button type="primary" size="small" onClick={onClickSave}>
+							Save
+						</Button>
+					</div>
+				</div>
+			) : (
+				<>
+					<p className="title-question">
+						Câu {props.stt + 1}. {title}
+					</p>
+					<div onClick={editHandle} style={{ cursor: "pointer" }}>
+						<table>
+							<thead>
+								<tr>
+									<th></th>
+									{columnLabel.map((e, i) => {
+										return (
+											<th
+												key={i}
+												className="td-table-create-question th-table-question-view"
+											>
+												{e.title}
+											</th>
+										);
+									})}
+								</tr>
+							</thead>
+							<tbody>
+								{rowLabel.map((item, i) => {
+									return (
+										<tr key={i}>
+											<td className="td-table-create-question">{item.title}</td>
+											{columnLabel.map((sub, i) => {
+												return (
+													<td
+														key={i}
+														style={{
+															margin: "auto",
+															textAlign: "center",
+															border: "solid",
+															borderWidth: "thin",
+														}}
+													>
+														<Checkbox />
+													</td>
+												);
+											})}
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+					</div>
+				</>
+			)}
+		</>
+	);
 };
 
 export default GridMultiChoise;

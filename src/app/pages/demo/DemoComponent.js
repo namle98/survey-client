@@ -2,7 +2,10 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Card } from "antd";
-import { CheckboxDemo, CommentBox, GridTextbox, SingleTextbox, GridSingleChoise, GridMultiChoise, GridSingleText, MultiChoise, SingleChoise } from '../../components'
+import { 
+  //CheckboxDemo, 
+  CommentBox, GridTextbox, SingleTextbox, GridSingleChoise, 
+  GridMultiChoise, GridSingleText, MultiChoise, SingleChoise } from '../../components'
 const DemoComponent = (props) => {
   return (
     <>
@@ -44,12 +47,12 @@ const DemoComponent = (props) => {
                 <MultiChoise stt={7} />
               </Card>
             </div>
-            <div style={{ margin: "10px" }}>
+            {/* <div style={{ margin: "10px" }}>
               <Card>
                 <SingleChoise stt={8} />
               </Card>
               <CheckboxDemo />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

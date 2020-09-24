@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-restricted-imports */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Form, Card, Col } from "react-bootstrap";
 import ButtonLoading from "../../partials/common/ButtonLoading";
@@ -13,33 +13,6 @@ import {
 import { validateSurveyName } from "../../libs/utils";
 const { Option } = Select;
 
-const fakeUnit = [
-	{
-		id: 1,
-		organization_name: "HTX A",
-	},
-	{
-		id: 2,
-		organization_name: "HTX B",
-	},
-	{
-		id: 3,
-		organization_name: "HTX C",
-	},
-];
-
-const fakeDetail = {
-	id: 3,
-	organization: {
-		id: 3,
-		organization_name: "HTX C",
-	},
-	survey_name: "Khao sat C",
-	instructions: "Huong Dan C",
-	other_header_info: "Du an C",
-	createdAt: "10/10/2000",
-};
-
 const AddSurveySection = (props) => {
 	const [dataAdd, setData] = useState({});
 	const [isSubmiting, setLoadSubmit] = useState(false);
@@ -51,8 +24,6 @@ const AddSurveySection = (props) => {
 	const sectionSubHeadingRef = useRef();
 	const sectionTitleRef = useRef();
 	const sectionRequiredRef = useRef();
-	const updateId = props.match.params.id;
-
 
 	const onChangeValue = (key, value) => {
 		setData({

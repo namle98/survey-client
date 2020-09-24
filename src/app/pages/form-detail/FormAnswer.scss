@@ -1,0 +1,36 @@
+.form-view-detail-answer {
+  width: 210mm;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden auto;
+}
+
+.answer-form {
+  // background: #b7bfea !important;
+  background-image: url('../../../_metronic/_assets/media/image/backgroudanswerrepeat.png');
+  height: inherit;
+}
+
+.instro-pre {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  width: 100%;
+  display: inline-block;
+  margin-bottom: 0px;
+  padding: 0px;
+  font-size: 100%;
+}
+
+.info-user {
+  text-align: left;
+}
+
+.info-user-action {
+  text-align: right;
+}
+
+.form-submit {
+  padding-top: 10px;
+}

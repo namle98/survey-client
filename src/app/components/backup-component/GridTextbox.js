@@ -1,21 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { connect } from "react-redux";
-import * as actions from './../../store/actions/index';
+import { updateMultiForm } from "./../../libs/utils";
+
+import * as actions from "./../../store/actions/index";
 
 let indexRow = 4;
 let indexColumn = 3;
 const GridTextbox = (props) => {
-	const [isEdit, setEdit] = useState(false);
-	const [title, setTitle] = useState(
-		"Do you have any other comments, questions, or concerns?"
+	const updateTitle = props.dataUpdate
+		? props.dataUpdate.title
+		: "Do you have any other comments, questions, or concerns?";
+
+	const { updateColumLabel, updateRowLabel } = updateMultiForm(
+		props.dataUpdate
+			? props.dataUpdate.question_columns
+				? props.dataUpdate.question_columns
+				: null
+			: null,
+		props.dataUpdate
+			? props.dataUpdate.question_row
+				? props.dataUpdate.question_row
+				: null
+			: null,
+		[{ id: 1, content: "columnLabel" }],
+		[{ id: 1, content: "rowlabel 1" }]
 	);
-	const [titleUpdate, setTitleUpdate] = useState("");
-	const [rowLabel, setRowLabel] = useState([{ id: 1, content: "rowlabel 1" }]);
-	const [columnLabel, setColumnLabel] = useState([
-		{ id: 1, content: "columnLabel 1" },
-	]);
+	const [rowLabel, setRowLabel] = useState(updateRowLabel);
+	const [columnLabel, setColumnLabel] = useState(updateColumLabel);
+	const [title, setTitle] = useState(updateTitle);
+	useEffect(() => {
+		setTitle(updateTitle);
+		setRowLabel(updateRowLabel);
+		setColumnLabel(updateColumLabel);
+		props.onStateAdded({
+			dataRow: updateRowLabel,
+			dataColumn: updateColumLabel,
+			title: updateTitle,
+		});
+	}, [updateTitle]);
+
+	const [isEdit, setEdit] = useState(false);
 
 	const handleClick = (handle) => {
 		switch (handle) {
@@ -30,7 +56,7 @@ const GridTextbox = (props) => {
 	};
 
 	const handleChangeTextbox = (e) => {
-		setTitleUpdate(e.target.value);
+		setTitle(e.target.value);
 	};
 	const handleChangeTextboxRowLabel = (id, evn) => {
 		let currenId = rowLabel
@@ -78,9 +104,7 @@ const GridTextbox = (props) => {
 	};
 
 	const handleSaveGridTextbox = () => {
-		setTitle(titleUpdate);
 		setEdit(false);
-
 		let dataRow = [...rowLabel];
 		dataRow = dataRow.filter((item) => item.content !== "");
 		setRowLabel(dataRow);
@@ -88,7 +112,7 @@ const GridTextbox = (props) => {
 		let dataColumn = [...columnLabel];
 		dataColumn = dataColumn.filter((item) => item.content !== "");
 		setColumnLabel(dataColumn);
-		props.onStateAdded({ dataColumn, dataRow, title: titleUpdate });
+		props.onStateAdded({ dataColumn, dataRow, title: title });
 	};
 	const removeColumnLabel = (e, id) => {
 		e.preventDefault();
@@ -163,51 +187,47 @@ const GridTextbox = (props) => {
 					})}
 					<div>
 						<Button
-							style={{marginRight: '5px'}}
+							style={{ marginRight: "5px" }}
 							size="small"
 							onClick={() => handleClick("cancel")}
 						>
 							Cancel
 						</Button>
-						<Button
-							type="primary"
-							size="small"
-							onClick={handleSaveGridTextbox}
-						>
+						<Button type="primary" size="small" onClick={handleSaveGridTextbox}>
 							Save
 						</Button>
 					</div>
 				</div>
 			) : (
-					<div onClick={() => handleClick("edit")} style={{ cursor: "pointer" }}>
-						<table>
-							<thead>
-								<tr>
-									<th></th>
-									{columnLabel.map((e, i) => {
-										return <th key={i}>{e.content}</th>;
-									})}
-								</tr>
-							</thead>
-							<tbody>
-								{rowLabel.map((e, i) => {
-									return (
-										<tr key={i}>
-											<td>{e.content}</td>
-											{columnLabel.map((e, i) => {
-												return (
-													<td key={i}>
-														<Input />
-													</td>
-												);
-											})}
-										</tr>
-									);
+				<div onClick={() => handleClick("edit")} style={{ cursor: "pointer" }}>
+					<table>
+						<thead>
+							<tr>
+								<th></th>
+								{columnLabel.map((e, i) => {
+									return <th key={i}>{e.content}</th>;
 								})}
-							</tbody>
-						</table>
-					</div>
-				)}
+							</tr>
+						</thead>
+						<tbody>
+							{rowLabel.map((e, i) => {
+								return (
+									<tr key={i}>
+										<td>{e.content}</td>
+										{columnLabel.map((e, i) => {
+											return (
+												<td key={i}>
+													<Input />
+												</td>
+											);
+										})}
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
+			)}
 		</>
 	);
 };

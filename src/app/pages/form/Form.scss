@@ -1,0 +1,61 @@
+.border-table .MuiPaper-root {
+  padding-right: 3rem;
+  padding-left: 3rem;
+  padding-bottom: 3rem;
+  padding-top: 2rem;
+}
+
+.border-table td.button-action-table {
+  text-align: left !important;
+}
+
+.median-line {
+  border-bottom: solid !important;
+  border-width: 0px !important;
+  border-color: #bdb4b4 !important;
+}
+
+.card-survey-section {
+  margin-bottom: 20px;
+}
+
+.median-line td,
+.median-line th {
+  border: 1px solid #b5b5b5 !important;
+  text-align: center !important;
+  padding: 8px !important;
+  border-width: thin;
+}
+
+.form-view-detail {
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden auto;
+  width: 210mm;
+}
+
+.modal-model-detail-form .ant-modal-body {
+  margin: 0 auto !important;
+  padding: 10px !important;
+  position: relative !important;
+}
+
+.modal-model-detail-form .ant-card-body {
+  padding: 12.5mm !important;
+}
+
+.modal-model-detail-form .ant-card-bordered {
+  border-width: 0px !important;
+}
+
+.instro-pre {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  width: 100%;
+  display: inline-block;
+  margin-bottom: 0px;
+  padding: 0px;
+  font-size: 100%;
+}

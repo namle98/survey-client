@@ -8,7 +8,11 @@ import Organization from "../../components/Organization/Organization";
 import makeRequest from '../../libs/request';
 import Loading from '../loading';
 import { Card } from "react-bootstrap";
-
+import { Steps } from 'antd';
+import { generateRandomCode } from '../../libs/random';
+import './Form.scss';
+import './table.css';
+const { Step } = Steps;
 const surveyTemp = {
   organization: {
     title: "",
@@ -20,7 +24,7 @@ const surveyTemp = {
     },
     survey_sections: [
       {
-        id: 1,
+        id: 'abcdefgh',
         title: "Đề mục",
         note: "",
         type: 1,
@@ -28,7 +32,7 @@ const surveyTemp = {
         questions: [
           {
             id: 1,
-            title: "test title",
+            title: "Tiêu đề câu hỏi",
             note: "",
             input_type_id: 1,
           },
@@ -39,7 +43,6 @@ const surveyTemp = {
 };
 
 const surveySectionTemp = {
-  id: 1,
   title: "Đề mục",
   note: "",
   type: 1,
@@ -47,7 +50,7 @@ const surveySectionTemp = {
   questions: [
     {
       id: 1,
-      title: "test title",
+      title: "Tiêu đề câu hỏi",
       note: "",
       input_type_id: 1,
     },
@@ -55,12 +58,13 @@ const surveySectionTemp = {
 }
 
 const questionTemp = {
-  title: "test title",
+  title: "Tiêu đề câu hỏi",
   note: "",
   input_type_id: 1,
 }
 
-const FormSurvey = (props) => {
+const AddForm = (props) => {
+  console.log('vaoooooooooooooo')
   const [isLoadSubmit, setLoadSubmit] = useState(false);
   const [step, setStep] = useState(1);
   const [surveyContent, setSurveyContent] = useState(surveyTemp);
@@ -93,9 +97,8 @@ const FormSurvey = (props) => {
       return showErrorMessage("Vui lòng nhập tiêu đề form");
     }
 
-    console.log('surveyContent.organization.type', surveyContent.organization.type)
     if (!surveyContent.organization.type) {
-      return showErrorMessage("Vui lòng nhập loại form giá trị 1 hoặc 2");
+      return showErrorMessage("Vui lòng chọn loại form");
     }
     setStep(2);
   };
@@ -123,74 +126,16 @@ const FormSurvey = (props) => {
     setStep(step);
   };
 
-  const addQuestionToSection = (e, idxSection) => {
-    e = window.event || e;
-    e.preventDefault();
-
-    let surveySectionsTemp = [...surveyContent.organization.survey_sections];
-    let selectdSection = surveySectionsTemp.find(
-      (item) => item.id === idxSection
-    );
-    let sectionIdx = surveySectionsTemp.findIndex(
-      (item) => item.id === idxSection
-    );
-    surveySectionsTemp[sectionIdx].questions.push({
-      id: selectdSection.lastQuesId,
-      title: "Câu hỏi?",
-      note: "",
-      input_type_id: 1,
-    });
-
-    setSurveyContent({
-      ...surveyContent,
-      survey_sections: surveySectionsTemp,
-    });
-  };
-
-  const saveQuestion = (survey_sections) => {
-    let organization = { ...surveyContent.organization };
-    let currentId = organization.survey_sections.findIndex(
-      (e) => e.id === survey_sections.id
-    );
-    organization.survey_sections[currentId] = survey_sections;
-    setSurveyContent({
-      ...surveyContent,
-      organization,
-    });
-  };
-
   const saveSurveySection = (surveySection) => {
     dataSend = surveyTemp;
     dataSend.organization.survey_sections = surveySection;
   };
 
-  const onChangeContentSurveySection = (e, key) => {
-    e = window.event || e;
-    e.preventDefault();
-
-    let organization = surveyContent.organization;
-    organization.survey_sections[key] = e.target.value;
-    setSurveyContent({
-      ...surveyContent,
-      organization,
-    });
-  }
 
   const onAddQuestionToSection = (idxSec) => {
     let organization = { ...surveyContent };
     organization.organization.survey_sections[idxSec].questions.push(questionTemp);
     setSurveyContent(organization);
-  }
-
-  const onRemoveQuestionFromSection = (e, idxSec, idxQues) => {
-    e = window.event || e;
-    e.preventDefault();
-    let organization = { ...surveyContent };
-    organization.organization.survey_sections[idxSec].questions.filter(item => item.id !== idxQues);
-    setSurveyContent({
-      ...surveyContent,
-      organization,
-    });
   }
 
   const onUpdateQuestionFromSection = (question, idxSec, idxQues) => {
@@ -207,7 +152,9 @@ const FormSurvey = (props) => {
 
   const addSection = () => {
     let organization = { ...surveyContent };
-    organization.organization.survey_sections.push(surveySectionTemp);
+    let sectionAdd = {...surveySectionTemp};
+    sectionAdd.id = generateRandomCode(6);
+    organization.organization.survey_sections.push(sectionAdd);
     setSurveyContent(organization);
   }
 
@@ -218,7 +165,7 @@ const FormSurvey = (props) => {
     makeRequest('post', `surveyform/create`, surveyContent).then(({ data }) => {
       if (data.signal) {
         showSuccessMessageIcon('Thêm form thành công');
-        return props.history.push('/organizations/list');
+        return props.history.push('/form/list');
       }
       setLoadSubmit(false);
     }).catch(err => {
@@ -237,14 +184,29 @@ const FormSurvey = (props) => {
 
   return (
     <>
-      {step === 1 && (
-        <>
-          <div className="row">
-            <div className="col-md-12">
-              <div className="kt-section">
-                <Card >
-                  <Card.Body>
-                    <div className="row" style={{ marginBottom: '20px', fontSize: '20px', font: 'bold' }}>Bước 1: Điền thông tin Form</div>
+      <div className="row">
+        <div className="col-md-12">
+          <div className="kt-section">
+            <Card >
+              <Card.Body>
+                <Steps current={step - 1}>
+                  <Step title="Tên Form" description="Nhập tên form khảo sát!" />
+                  <Step title="Tiêu Đề Form" description="Nhập tên form header!" />
+                  <Step title="Câu hỏi" description="Khởi tạo các câu hỏi" />
+                </Steps>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-md-12">
+          <div className="kt-section">
+            <Card >
+              <Card.Body>
+                {step === 1 && (
+                  <>
                     <Organization
                       formHeader={surveyContent}
                       onChangeHeaderForm={onChangeHeaderForm}
@@ -254,65 +216,74 @@ const FormSurvey = (props) => {
                         Tiếp tục
                       </button>
                     </div>
-                  </Card.Body>
-                </Card>
-              </div>
-            </div>
+                  </>
+                )
+                }
+                {
+                  step === 2 && (
+                    <>
+                      <SurveyHeader
+                        survey_headers={surveyContent.organization.survey_headers}
+                        onChangeHeader={onChangeHeader}
+                      />
+                      <div style={{ paddingTop: "20px" }}>
+                        <button onClick={() => backStep(1)} className="btn btn-secondary">
+                          Quay lại
+                        </button>
+                        <button
+                            onClick={passStep2}
+                            className="btn btn-primary"
+                            style={{ marginLeft: "25px" }}
+                          >
+                            Tiếp tục
+                        </button>
+                      </div>
+                    </>
+                  )
+                }
+                {
+                  step === 3 && (
+                    <>
+                      {surveyContent.organization && surveyContent.organization.survey_sections ? surveyContent.organization.survey_sections.map((item, idx) => {
+                        return (
+                          <Card className="card-survey-section" >
+                            <Card.Body>
+                              <div className="row median-line" key={`section-${item.id}-${item.unique}`}>
+                                <SurveySection
+                                  surveySection={item}
+                                  addQuestion={onAddQuestionToSection}
+                                  saveSurveySection={saveSurveySection}
+                                  idxSection={idx}
+                                  saveQuestion={onUpdateQuestionFromSection}
+                                  onChangeTypeQues={onChangeTypeQues}
+                                  onChangeSurveyTitle={onChangeSurveyTitle}
+                                />
+                              </div>
+                            </Card.Body>
+                          </Card >
+                        );
+                      }) : null}
+
+                      <div style={{ paddingTop: "20px" }}>
+                        <button onClick={() => backStep(2)} className="btn btn-secondary" style={{ marginRight: '10px' }}>
+                          Quay lại
+                        </button>
+                        <button onClick={addSection} className="btn btn-success" style={{ marginRight: '10px' }}>
+                          Thêm đề mục
+                        </button>
+                        <button onClick={(e) => saveForm(e)} className="btn btn-primary">
+                          Lưu form
+                        </button>
+                      </div>
+
+                    </>
+                  )
+                }
+              </Card.Body>
+            </Card>
           </div>
-        </>
-      )}
-      {step === 2 && (
-        <>
-          <div className="row" style={{ marginBottom: '20px', fontSize: '20px', font: 'bold' }}>Bước 2: Điền thông tin tiêu đề</div>
-          <SurveyHeader
-            survey_headers={surveyContent.organization.survey_headers}
-            onChangeHeader={onChangeHeader}
-          />
-          <div style={{ paddingTop: "20px" }}>
-            <button onClick={() => backStep(1)} className="btn btn-primary">
-              Quay lại
-            </button>
-            <button
-              onClick={passStep2}
-              className="btn btn-primary"
-              style={{ marginLeft: "25px" }}
-            >
-              Tiếp tục
-            </button>
-          </div>
-        </>
-      )}
-      {step === 3 && (
-        <>
-          <div className="row" style={{ fontSize: '20px', font: 'bold' }}>Bước 3: Điền thông tin đề mục</div>
-          {surveyContent.organization && surveyContent.organization.survey_sections ? surveyContent.organization.survey_sections.map((item, idx) => {
-            return (
-              <div className="row" key={idx} style={{ borderBottom: 'solid' }}>
-                <SurveySection
-                  surveySection={item}
-                  addQuestion={onAddQuestionToSection}
-                  saveSurveySection={saveSurveySection}
-                  idxSection={idx}
-                  saveQuestion={onUpdateQuestionFromSection}
-                  onChangeTypeQues={onChangeTypeQues}
-                  onChangeSurveyTitle={onChangeSurveyTitle}
-                />
-              </div>
-            );
-          }) : null}
-          <div style={{ paddingTop: "20px" }}>
-            <button onClick={() => backStep(2)} className="btn btn-primary" style={{ marginRight: '10px' }}>
-              Quay lại
-            </button>
-            <button onClick={addSection} className="btn btn-success" style={{ marginRight: '10px' }}>
-              Thêm đề mục
-            </button>
-            <button onClick={(e) => saveForm(e)} className="btn btn-primary">
-              Lưu form
-            </button>
-          </div>
-        </>
-      )}
+        </div>
+      </div>
     </>
   );
 };
@@ -321,4 +292,4 @@ const mapStateToProps = ({ auth }) => ({
   user: auth.user,
 });
 
-export default connect(mapStateToProps, null)(FormSurvey);
+export default connect(mapStateToProps, null)(AddForm);

@@ -4,48 +4,68 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import { LayoutSplashScreen } from "../../../_metronic";
 
 {
-  /* =============Dashboard============= */
+	/* =============Dashboard============= */
 }
 const Dashboard = lazy(() => import("../dashboard/Dashboard"));
 
 {
-  /* ==============SurveyHeader Page============= */
+	/* ==============SurveyHeader Page============= */
 }
 const AddEditSurveyHeader = lazy(() =>
-  import("../survey-header/AddEditSurveyHeader")
+	import("../survey-header/AddEditSurveyHeader")
 );
 const ListSurveyHeader = lazy(() =>
-  import("../survey-header/ListSurveyHeader")
+	import("../survey-header/ListSurveyHeader")
 );
 
 const DemoComponent = lazy(() => import("../demo/DemoComponent"));
 {
-  /* ==============SurveyHeader Page============= */
+	/* ==============SurveyHeader Page============= */
 }
+
 const AddEditOrganization = lazy(() =>
-  import("../organizations/AddEditOrganization")
+	import("../organizations/AddEditOrganization")
 );
+
 const ListOrganization = lazy(() =>
-  import("../organizations/ListOrganization")
+	import("../organizations/ListOrganization")
 );
 
 {
-  /* ==============SurveyHeader Page============= */
+	/* ==============SurveyHeader Page============= */
 }
-const AddEditQuestion = lazy(() => import("../questions/AddEditQuestion"));
+const ListSurveyRoundsOrg = lazy(() =>
+	import("../survey-rounds/ListSurveyRoundsOrg")
+);
+
+{
+	/* ==============SurveyHeader Page============= */
+}
+const AddEditSurveyRounds = lazy(() =>
+	import("../survey-rounds/AddEditSurveyRounds")
+);
+const ListSurveyRounds = lazy(() =>
+	import("../survey-rounds/ListSurveyRounds")
+);
+
+{
+	/* ==============SurveyHeader Page============= */
+}
+const AddQuestion = lazy(() => import("../questions/AddQuestion"));
+const EditQuestion = lazy(() => import("../questions/EditQuestion"));
 const ListQuestion = lazy(() => import("../questions/ListQuestion"));
 
 {
-  /* ==============SurveySection Page============= */
+	/* ==============SurveySection Page============= */
 }
 const AddSurveySection = lazy(() =>
-  import("../survey-sections/AddSurveySection")
+	import("../survey-sections/AddSurveySection")
 );
 const EditSurveySection = lazy(() =>
-  import("../survey-sections/EditSurveySection")
+	import("../survey-sections/EditSurveySection")
 );
 const ListSurveySection = lazy(() =>
-  import("../survey-sections/ListSurveySection")
+	import("../survey-sections/ListSurveySection")
 );
 const DemoQuestion = lazy(() => import("../demoQuestion/DemoQuestion"));
 const FormSurvey = lazy(() => import("../form/FormSurvey"));
@@ -58,76 +78,92 @@ const ListForm = lazy(() => import("../form/ListForm"));
 // const AddForm = lazy(() => import("../form/AddForm"));
 const ListAnswers = lazy(() => import("../answers/ListAnswers"));
 
+// const FormAnswer = lazy(() =>
+//   import("../form-detail/FormAnswer")
+// );
+
 {
-  /* =============Error Page============= */
+	/* =============Error Page============= */
 }
 const Error403 = lazy(() => import("../common/Error403"));
 {
-  /* ==================================== */
+	/* ==================================== */
 }
 
 export default function HomePage() {
-  return (
-    <Suspense fallback={<LayoutSplashScreen />}>
-      <Switch>
-        {
-          /* Redirect from root URL to /dashboard. */
-          <Redirect exact from="/" to="/dashboard" />
-        }
+	return (
+		<Suspense fallback={<LayoutSplashScreen />}>
+			<Switch>
+				{
+					/* Redirect from root URL to /dashboard. */
+					<Redirect exact from="/" to="/dashboard" />
+				}
 
-        {/* Route survey-header */}
-        <Route
-          path="/survey-header/add"
-          exact
-          component={AddEditSurveyHeader}
-        />
-        <Route
-          path="/survey-header/update/:id"
-          component={AddEditSurveyHeader}
-        />
-        <Route path="/survey-header/list" component={ListSurveyHeader} />
+				{/* Route survey-header */}
+				<Route
+					path="/survey-header/add"
+					exact
+					component={AddEditSurveyHeader}
+				/>
+				<Route
+					path="/survey-header/update/:id"
+					component={AddEditSurveyHeader}
+				/>
+				<Route path="/survey-header/list" component={ListSurveyHeader} />
 
-        {/* Route organizations */}
-        <Route
-          path="/organizations/add"
-          exact
-          component={AddEditOrganization}
-        />
-        <Route
-          path="/organizations/update/:id"
-          component={AddEditOrganization}
-        />
-        <Route path="/organizations/list" component={ListOrganization} />
+				{/* Route organizations */}
+				<Route
+					path="/organizations/add"
+					exact
+					component={AddEditOrganization}
+				/>
+				<Route
+					path="/organizations/update/:id"
+					component={AddEditOrganization}
+				/>
+				<Route path="/organizations/list" component={ListOrganization} />
 
-        {/* Route questions */}
-        <Route path="/questions/add" exact component={AddEditQuestion} />
-        <Route path="/questions/update/:id" component={AddEditQuestion} />
-        <Route path="/questions/list" component={ListQuestion} />
+				{/* Route other */}
+				<Route path="/answer/list" component={ListAnswers} />
+				{/* Route survey rounds */}
+				<Route path="/surveyround/add" exact component={AddEditSurveyRounds} />
+				<Route path="/surveyround/update/:id" component={AddEditSurveyRounds} />
 
-        {/* Route questions */}
-        <Route path="/survey-sections/add" exact component={AddSurveySection} />
-        <Route
-          path="/survey-sections/update/:id"
-          component={EditSurveySection}
-        />
-        <Route path="/survey-sections/list" component={ListSurveySection} />
+				<Route path="/surveyround/list" component={ListSurveyRounds} />
 
-        {/* Route other */}
-        <Route path="/dashboard" component={Dashboard} />
+				{/* Route survey rounds org */}
 
-        {/* Route other */}
-        <Route path="/demo" component={DemoComponent} />
-        <Route path="/demoQuestion" component={DemoQuestion} />
-        <Route path="/formSurvey" component={FormSurvey} />
-        <Route path="/form/add" component={AddForm} />
-        <Route path="/showForm" component={ShowFormSurvey} />
-        <Route path="/form/list" component={ListForm} />
-        <Route path="/form/edit/:id" component={EditForm} />
-        <Route path="/answers" component={ListAnswers} />
+				<Route path="/surveyroundorg/list" component={ListSurveyRoundsOrg} />
 
-        {/* <Redirect to="Error403" /> */}
-        <Route path="/Error403" component={Error403} />
-      </Switch>
-    </Suspense>
-  );
+				{/* Route questions */}
+				<Route path="/questions/add" exact component={AddQuestion} />
+				<Route path="/questions/update/:id" component={EditQuestion} />
+				<Route path="/questions/list" component={ListQuestion} />
+
+				{/* Route questions */}
+				<Route path="/survey-sections/add" exact component={AddSurveySection} />
+				<Route
+					path="/survey-sections/update/:id"
+					component={EditSurveySection}
+				/>
+				<Route path="/survey-sections/list" component={ListSurveySection} />
+
+				{/* Route other */}
+				<Route path="/dashboard" component={Dashboard} />
+
+				{/* Route other */}
+				{/* <Route path="/demo" component={DemoComponent} /> */}
+				<Route path="/demoQuestion" component={DemoQuestion} />
+				<Route path="/formSurvey" component={FormSurvey} />
+				<Route path="/form/add" component={AddForm} />
+				<Route path="/showForm" component={ShowFormSurvey} />
+				<Route path="/form/list" component={ListForm} />
+				<Route path="/form/edit/:id" component={EditForm} />
+				<Route path="/answers" component={ListAnswers} />
+
+				{/* <Redirect to="Error403" /> */}
+				<Route path="/Error403" component={Error403} />
+			</Switch>
+		</Suspense>
+	);
 }

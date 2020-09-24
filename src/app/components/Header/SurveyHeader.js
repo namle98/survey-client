@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import './SurveyHeader.scss';
 import { Input } from "antd";
 const { TextArea } = Input;
 
@@ -11,11 +12,11 @@ const positionEl = [
   },
   {
     id: 2,
-    el: "Miêu tả",
+    el: "Tên đề tài",
   },
   {
     id: 3,
-    el: "Hướng dẫn",
+    el: "Lời mở đầu",
   },
 ];
 
@@ -67,6 +68,7 @@ const SurveyHeader = (props) => {
     } else {
       return (
         <TextArea
+          className = "preamble"
           value={props.survey_headers && props.survey_headers.introduction}
           onChange={(e) => props.onChangeHeader(e, "introduction")}
         />

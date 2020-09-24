@@ -33,7 +33,7 @@ const CheckboxDemo = (props) => {
     const handleSubmit = (e) => {
 
         e.preventDefault();
-        inputFields.map((item, i) => {
+        inputFields.forEach((item, i) => {
             if (item.isQuesion) {
                 data.push(
                     <div>
@@ -46,7 +46,7 @@ const CheckboxDemo = (props) => {
                     </div>)
             }
 
-        })
+        });
         setCheckboxData(data);
 
     };
@@ -77,7 +77,7 @@ const CheckboxDemo = (props) => {
                 {inputFields.map((inputField, index) => (
                     <div key={index}>
                         {
-                            inputField.isQuesion == true &&
+                            inputField.isQuesion === true &&
 
                             <TextField
                                 name="question"

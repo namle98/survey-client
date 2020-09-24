@@ -1,25 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Input } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { connect } from "react-redux";
-import * as actions from './../../store/actions/index';
+import * as actions from "./../../store/actions/index";
+import { updateMultiForm } from "./../../libs/utils";
 
 let indexRow = 4;
 const GridSingleText = (props) => {
+	const updateTitle = props.dataUpdate
+		? props.dataUpdate.title
+		: "Do you have any other comments, questions, or concerns?";
+
+	const { updateColumLabel, updateRowLabel } = updateMultiForm(
+		props.dataUpdate
+			? props.dataUpdate.question_columns
+				? props.dataUpdate.question_columns
+				: null
+			: null,
+		props.dataUpdate
+			? props.dataUpdate.question_row
+				? props.dataUpdate.question_row
+				: null
+			: null,
+		[{ id: 1, content: "Content" }],
+		[
+			{ id: 1, content: "rowlabel 1" },
+			{ id: 2, content: "rowlabel 2" },
+			{ id: 3, content: "rowlabel 3" },
+		]
+	);
+	const [rowLabel, setRowLabel] = useState(updateRowLabel);
+	const [columnLabel, setColumnLabel] = useState(updateColumLabel);
+	const [title, setTitle] = useState(updateTitle);
+	useEffect(() => {
+		setTitle(updateTitle);
+		setRowLabel(updateRowLabel);
+		setColumnLabel(updateColumLabel);
+		props.onStateAdded({
+			dataRow: updateRowLabel,
+			dataColumn: updateColumLabel,
+			title: updateTitle,
+		});
+	}, [updateTitle]);
+
 	const [isEdit, setEdit] = useState(false);
 	const [preTitle, setPreTitle] = useState();
 	const [preRowLabel, setPreRowLabel] = useState();
-	const [title, setTitle] = useState(
-		"Do you have any other comments, questions, or concerns?"
-	);
-	const [rowLabel, setRowLabel] = useState([
-		{ id: 1, content: "rowlabel 1" },
-		{ id: 2, content: "rowlabel 2" },
-		{ id: 3, content: "rowlabel 3" },
-	]);
-	const [columnLabel, setColumnLabel] = useState([
-		{ id: 1, content: "Content" },
-	]);
 
 	const handleChange = (e) => {
 		e.preventDefault();
@@ -109,7 +135,7 @@ const GridSingleText = (props) => {
 						return (
 							<div key={i}>
 								<Input
-									style={{ width: "70%", marginRight: "10px" }}
+									style={{ width: "80%", marginRight: "10px" }}
 									onChange={(e) => handleChangeRowLabel(e, item.id)}
 									defaultValue={item.content}
 								/>
@@ -126,12 +152,12 @@ const GridSingleText = (props) => {
 							</div>
 						);
 					})}
-					<label>Columns label</label>
+					<label>Tiêu đề cột</label>
 					{columnLabel.map((item, idx) => {
 						return (
 							<div key={idx}>
 								<Input
-									style={{ width: "70%", marginRight: "10px" }}
+									style={{ width: "80%", marginRight: "10px" }}
 									defaultValue={item.content}
 									onChange={(e) => handleChangeColumnLabel(e, item.id)}
 								/>
@@ -140,17 +166,13 @@ const GridSingleText = (props) => {
 					})}
 					<div>
 						<Button
-							style={{ marginRight: '5px'}}
+							style={{ marginRight: "5px" }}
 							size="small"
 							onClick={(e) => onClickCancel(e)}
 						>
 							Cancel
 						</Button>
-						<Button
-							type="primary"
-							size="small"
-							onClick={(e) => onClickSave(e)}
-						>
+						<Button type="primary" size="small" onClick={(e) => onClickSave(e)}>
 							Save
 						</Button>
 					</div>

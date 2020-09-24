@@ -1,14 +1,51 @@
-table {
+/* tbody {
+	box-shadow: 0 0 0 1px #f0f0f0;
+} */
+
+.custom-table table{
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
 }
 
-td,
-th {
-  border: 1px solid black !important;
+.border-table td,
+.border-table th {
+  border: 1px solid #f0f0f0 !important;
   text-align: center !important;
   padding: 8px !important;
+  border-width: thin;
+}
+
+
+.border-table-default td,
+.border-table-default th {
+  text-align: center !important;
+  padding: 8px !important;
+  border-width: thin;
+}
+
+.border-table-default th {
+  background-color: #cecee4;
+}
+
+
+.border-table-default .MuiPaper-root {
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  padding-bottom: 1.5rem;
+  padding-top: 2rem;
+}
+
+.border-table-default td.button-action-table {
+  text-align: left !important;
+}
+
+.border-table-default-popup td {
+  text-align: left !important;
+}
+
+.border-table-default-popup .tablecell-action {
+  text-align: center !important;
 }
 
 /* table {

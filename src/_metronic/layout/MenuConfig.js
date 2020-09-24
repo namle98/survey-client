@@ -2,14 +2,6 @@ export default {
   header: {
     self: {},
     items: [
-      {
-        title: "Dashboards",
-        root: true,
-        alignment: "left",
-        page: "dashboard",
-        permission: "dashboards",
-        translate: "MENU.DASHBOARD",
-      },
     ],
   },
   aside: {
@@ -25,42 +17,26 @@ export default {
         bullet: "dot",
       },
       {
-        title: "Quản lý tiêu đề",
+        title: "Quản lý đợt khảo sát",
         root: true,
         bullet: "dot",
-        icon: "flaticon2-writing",
+        icon: "flaticon-layer",
         submenu: [
           {
             title: "Thêm",
-            page: "survey-header/add",
+            page: "surveyround/add"
           },
           {
             title: "Danh sách",
-            page: "survey-header/list",
-          },
-        ],
+            page: "surveyround/list"
+          }
+        ]
       },
       {
-        title: "Quản lý tổ chức/HTX",
+        title: "Quản lý câu hỏi mẫu",
         root: true,
         bullet: "dot",
-        icon: "flaticon2-writing",
-        submenu: [
-          {
-            title: "Thêm",
-            page: "organizations/add",
-          },
-          {
-            title: "Danh sách",
-            page: "organizations/list",
-          },
-        ],
-      },
-      {
-        title: "Quản lý câu hỏi",
-        root: true,
-        bullet: "dot",
-        icon: "flaticon2-writing",
+        icon: "flaticon-questions-circular-button",
         submenu: [
           {
             title: "Thêm",
@@ -72,49 +48,21 @@ export default {
           },
         ],
       },
-      {
-        title: "Quản lý đề mục khảo sát",
-        root: true,
-        bullet: "dot",
-        icon: "flaticon2-writing",
-        submenu: [
-          {
-            title: "Thêm",
-            page: "survey-sections/add",
-          },
-          {
-            title: "Danh sách",
-            page: "survey-sections/list",
-          },
-        ],
-      },
       // {
-      //   title: "Demo component",
+      //   title: "Quản lý đợt khảo sát",
       //   root: true,
       //   bullet: "dot",
       //   icon: "flaticon2-writing",
-      //   page: "demo",
-      // },
-      // {
-      //   title: "Demo Question",
-      //   root: true,
-      //   bullet: "dot",
-      //   icon: "flaticon2-writing",
-      //   page: "demoQuestion",
-      // },
-      // {
-      //   title: "Demo formSurvey",
-      //   root: true,
-      //   bullet: "dot",
-      //   icon: "flaticon2-writing",
-      //   page: "formSurvey",
-      // },
-      // {
-      //   title: "Demo ShowForm",
-      //   root: true,
-      //   bullet: "dot",
-      //   icon: "flaticon2-writing",
-      //   page: "showForm",
+      //   submenu: [
+      //     {
+      //       title: "Thêm",
+      //       page: "survey-sections/add",
+      //     },
+      //     {
+      //       title: "Danh sách",
+      //       page: "survey-sections/list",
+      //     },
+      //   ],
       // },
       {
         title: "Quản lý form",
@@ -129,21 +77,21 @@ export default {
           {
             title: "Danh sách",
             page: "form/list",
-          },
+          }
         ],
       },
       {
-        title: "Quản lý answers",
+        title: "Quản lý kết quả trả lời",
         root: true,
         bullet: "dot",
-        icon: "flaticon2-writing",
+        icon: "flaticon-paper-plane",
         submenu: [
           {
             title: "Danh sách",
-            page: "answers",
+            page: "answer/list",
           },
         ],
-      },
+      }
     ],
   },
 };

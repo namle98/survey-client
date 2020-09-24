@@ -9,7 +9,7 @@ const TitleQuestion = (props) => {
         <Select
           value={props.typeSelect}
           onChange={props.onChangeType}
-          style={{ width: "100%" }}
+          style={{ width: "100%", marginTop: '32px' }}
           defaultValue={"Chọn kiểu câu hỏi"}
         >
           {props.TypeQuestion &&

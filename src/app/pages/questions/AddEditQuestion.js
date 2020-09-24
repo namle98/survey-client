@@ -7,7 +7,8 @@ import { makeid } from "../../libs/utils";
 import { Form, Card, Col } from "react-bootstrap";
 import ButtonLoading from "../../partials/common/ButtonLoading";
 import makeRequest from "../../libs/request";
-import { Select, Spin, Input, Radio } from "antd";
+import { Select, Input } from "antd";
+import "./table.css";
 import {
 	showErrorMessage,
 	showSuccessMessageIcon,
@@ -19,49 +20,14 @@ const { Option } = Select;
 const AddEditQuestion = (props) => {
 	const [dataAdd, setData] = useState({});
 	const [isSubmiting, setLoadSubmit] = useState(false);
-	const [isSearchSurveySection, setsearchSurveySection] = useState(false);
-	const [listSurveySection, setListSurveySection] = useState([]);
-	const [textSearch, setTextSearch] = useState("");
-	const [questions, setQuestions] = useState("");
-	const [listInputType, setListInputType] = useState([
-		{
-			id: 1,
-			type: "CommentBox",
-		},
-		{
-			id: 2,
-			type: "GridTextbox",
-		},
-		{
-			id: 3,
-			type: "SingleTextbox",
-		},
-		{
-			id: 4,
-			type: "GridSingleChoise",
-		},
-		{
-			id: 5,
-			type: "GridMultiChoise",
-		},
-		{
-			id: 6,
-			type: "GridSingleText",
-		},
-		{
-			id: 7,
-			type: "MultiChoise",
-		},
-		{
-			id: 8,
-			type: "SingleChoise",
-		},
-	]);
-	const surveySectionRef = useRef();
+	//const [] = useState(false);
+	const [, setListSurveySection] = useState([]);
+	// const [] = useState("");
+	// const [] = useState("");
+	const [listInputType, setListInputType] = useState();
 	const [typeSelect, setTypeSelect] = useState();
 	const inputTypeRef = useRef();
 	const questionNameRef = useRef();
-	const answerRequiredRef = useRef();
 	const questionSubtextRef = useRef();
 	const updateId = props.match.params.id;
 	const [valueCommentBox, setValueCommentBox] = useState();
@@ -74,7 +40,7 @@ const AddEditQuestion = (props) => {
 	const [valueSigleChoise, setValueSigleChoise] = useState();
 
 	useEffect(() => {
-		// getInputTypes();
+		getInputTypes();
 		if (updateId) {
 			getQuestionById(updateId);
 		}
@@ -96,20 +62,6 @@ const AddEditQuestion = (props) => {
 		props.valueMultiChoise,
 		props.valueSigleChoise,
 	]);
-
-	const getInputTypes = () => {
-		makeRequest("get", `question/getInputType`).then(({ data }) => {
-			if (data.signal) {
-				let arrInputType = data.data.map((it) => {
-					return {
-						label: `${it.input_type_name}`,
-						value: it.id,
-					};
-				});
-				setListInputType(arrInputType);
-			}
-		});
-	};
 
 	const getQuestionById = (id) => {
 		makeRequest("get", `question/getbyId?id=${id}`)
@@ -152,43 +104,42 @@ const AddEditQuestion = (props) => {
 		if (!updateId) {
 			let questions = [];
 			let question = [];
-			let id = makeid(15) + Date.now();
 			if (typeSelect === 1 || typeSelect === 3) {
 				let title = "";
-				if (typeSelect == 1) {
+				if (typeSelect === 1) {
 					title = valueCommentBox;
 				} else {
 					title = valueSigleTextBox;
 				}
 				question = {
-					id,
 					code: makeid(15) + Date.now(),
 					title: title,
 					note: dataAdd.note ? dataAdd.note : "",
+					question_table_note: dataAdd.note_child ? dataAdd.note_child : "",
 					parent_id: 0,
-					have_child: false,
+					have_child: 0,
 					index: 1,
 					type: 1,
 					intput_type: dataAdd.input_type_id,
 				};
-				questions.push(question);
+				questions.push({ question });
 			}
 			if (typeSelect === 2 || typeSelect === 6) {
 				let question_columns = [];
 				let question_rows = [];
 
 				let data = "";
-				if (typeSelect == 2) {
+				if (typeSelect === 2) {
 					data = valueGripTextBox;
 				} else {
 					data = valueGridSigleText;
 				}
 				// question
 				question = {
-					id,
 					code: makeid(15) + Date.now(),
 					title: data.title,
 					note: dataAdd.note ? dataAdd.note : "",
+					question_table_note: dataAdd.note_child ? dataAdd.note_child : "",
 					parent_id: 0,
 					have_child: false,
 					index: 1,
@@ -198,7 +149,6 @@ const AddEditQuestion = (props) => {
 				// Question column
 				data.dataColumn.forEach((item) => {
 					question_columns.push({
-						question_id: id,
 						code: makeid(15) + Date.now(),
 						title: item.content,
 						note: dataAdd.note_child ? dataAdd.note_child : "",
@@ -209,7 +159,6 @@ const AddEditQuestion = (props) => {
 				// Question row
 				data.dataRow.forEach((item) => {
 					question_rows.push({
-						question_id: id,
 						code: makeid(15) + Date.now(),
 						title: item.content,
 						note: dataAdd.note_child ? dataAdd.note_child : "",
@@ -224,17 +173,17 @@ const AddEditQuestion = (props) => {
 				let question_columns = [];
 				let question_rows = [];
 				let data = "";
-				if (typeSelect == 4) {
+				if (typeSelect === 4) {
 					data = valueGridSigleChoise;
 				} else {
 					data = valueGridMultiChoise;
 				}
 				// question
 				question = {
-					id,
 					code: makeid(15) + Date.now(),
 					title: data.title,
 					note: dataAdd.note ? dataAdd.note : "",
+					question_table_note: dataAdd.note_child ? dataAdd.note_child : "",
 					parent_id: 0,
 					have_child: false,
 					index: 1,
@@ -244,7 +193,6 @@ const AddEditQuestion = (props) => {
 				// Question column
 				data.dataColumn.forEach((item) => {
 					question_columns.push({
-						question_id: id,
 						code: makeid(15) + Date.now(),
 						title: item.content,
 						note: dataAdd.note_child ? dataAdd.note_child : "",
@@ -255,7 +203,6 @@ const AddEditQuestion = (props) => {
 				// Question row
 				data.dataRow.forEach((item) => {
 					question_rows.push({
-						question_id: id,
 						code: makeid(15) + Date.now(),
 						title: item.content,
 						note: dataAdd.note_child ? dataAdd.note_child : "",
@@ -269,17 +216,17 @@ const AddEditQuestion = (props) => {
 			if (typeSelect === 7 || typeSelect === 8) {
 				let question_row = [];
 				let data = "";
-				if (typeSelect == 7) {
+				if (typeSelect === 7) {
 					data = valueMultiChoise;
 				} else {
 					data = valueSigleChoise;
 				}
 				// question
 				question = {
-					id,
 					code: makeid(15) + Date.now(),
 					title: data.title,
 					note: dataAdd.note ? dataAdd.note : "",
+					question_table_note: dataAdd.note_child ? dataAdd.note_child : "",
 					parent_id: 0,
 					have_child: false,
 					index: 1,
@@ -289,7 +236,6 @@ const AddEditQuestion = (props) => {
 				// Question row
 				data.dataRow.forEach((item) => {
 					question_row.push({
-						question_id: id,
 						code: makeid(15) + Date.now(),
 						title: item.content,
 						note: dataAdd.note_child ? dataAdd.note_child : "",
@@ -298,7 +244,7 @@ const AddEditQuestion = (props) => {
 					});
 				});
 				question = { ...question, question_choise: question_row };
-				questions.push(question);
+				questions.push({ question });
 			}
 			makeRequest("post", `question/create`, questions)
 				.then(({ data }) => {
@@ -325,8 +271,22 @@ const AddEditQuestion = (props) => {
 				});
 		}
 	};
+	const getInputTypes = () => {
+		makeRequest("get", `question/getInputType`).then(({ data }) => {
+			if (data.signal) {
+				let arrInputType = data.data.map((it) => {
+					return {
+						type: `${it.title}`,
+						id: it.value,
+					};
+				});
+
+				setListInputType(arrInputType);
+			}
+		});
+	};
 	const onChangeInputType = (value) => {
-		setTypeSelect(value);
+		setTypeSelect(parseInt(value));
 		if (value) {
 			setData({
 				...dataAdd,
@@ -348,8 +308,9 @@ const AddEditQuestion = (props) => {
 												Chọn kiểu trả lời
 											</Form.Label>
 											<Select
-												defaultValue="Chọn kiểu trả lời"
+												defaultValue={1}
 												onChange={onChangeInputType}
+												value={dataAdd.input_type_id}
 												style={{ width: "100%" }}
 												ref={inputTypeRef}
 											>
@@ -398,31 +359,21 @@ const AddEditQuestion = (props) => {
 											/>
 										</Form.Group>
 									</Form.Row>
-									{typeSelect != 1 ? (
-										typeSelect != 3 ? (
-											<Form.Row>
-												<Form.Group
-													as={Col}
-													controlId="formBasicQuestionSubtext"
-												>
-													<Form.Label>Chú thích phướng án trả lời</Form.Label>
-													<TextArea
-														type="text"
-														placeholder=""
-														value={dataAdd.note_child || ""}
-														onChange={(e) => {
-															onChangeValue("note_child", e.target.value);
-														}}
-														ref={questionSubtextRef}
-													/>
-												</Form.Group>
-											</Form.Row>
-										) : (
-											""
-										)
-									) : (
-										""
-									)}
+
+									<Form.Row>
+										<Form.Group as={Col} controlId="formBasicQuestionSubtext">
+											<Form.Label>Chú thích phướng án trả lời</Form.Label>
+											<TextArea
+												type="text"
+												placeholder=""
+												value={dataAdd.note_child || ""}
+												onChange={(e) => {
+													onChangeValue("note_child", e.target.value);
+												}}
+												ref={questionSubtextRef}
+											/>
+										</Form.Group>
+									</Form.Row>
 
 									<div className="kt-login__actions">
 										<Link

@@ -1,24 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Input, Radio } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { connect } from "react-redux";
-import * as actions from './../../store/actions/index';
+import * as actions from "./../../store/actions/index";
+import { updateMultiForm } from "./../../libs/utils";
 
 let indexRow = 4;
 const SingleChoise = (props) => {
+	const updateTitle = props.dataUpdate
+		? props.dataUpdate.title
+		: "Do you have any other comments, questions, or concerns?";
+
+	const { updateRowLabel } = updateMultiForm(
+		props.dataUpdate
+			? props.dataUpdate.question_columns
+				? props.dataUpdate.question_columns
+				: null
+			: null,
+		props.dataUpdate
+			? props.dataUpdate.question_choise
+				? props.dataUpdate.question_choise
+				: null
+			: null,
+		null,
+		[
+			{ id: 1, content: "rowlabel 1" },
+			{ id: 2, content: "rowlabel 2" },
+			{ id: 3, content: "rowlabel 3" },
+		]
+	);
+	useEffect(() => {
+		setTitle(updateTitle);
+		setRowLabel(updateRowLabel);
+		props.onStateAdded({
+			dataRow: updateRowLabel,
+			title: updateTitle,
+		});
+	}, [updateTitle]);
+	const [title, setTitle] = useState(updateTitle);
+	const [rowLabel, setRowLabel] = useState(updateRowLabel);
+
 	const [isEdit, setEdit] = useState(false);
 	const [choise, setChoise] = useState("");
 	const [preTitle, setPreTitle] = useState();
 	const [preRowLabel, setPreRowLabel] = useState();
-	const [title, setTitle] = useState(
-		"Do you have any other comments, questions, or concerns?"
-	);
-
-	const [rowLabel, setRowLabel] = useState([
-		{ id: 1, content: "rowlabel 1" },
-		{ id: 2, content: "rowlabel 2" },
-		{ id: 3, content: "rowlabel 3" },
-	]);
 
 	const handleChange = (e) => {
 		e.preventDefault();
@@ -98,7 +123,7 @@ const SingleChoise = (props) => {
 						return (
 							<div key={i}>
 								<Input
-									style={{ width: "70%", marginRight: "10px" }}
+									style={{ width: "80%", marginRight: "10px" }}
 									onChange={(e) => handleChangeRowLabel(e, item.id)}
 									defaultValue={item.content}
 								/>
@@ -115,46 +140,42 @@ const SingleChoise = (props) => {
 							</div>
 						);
 					})}
-					<div >
+					<div>
 						<Button
-							style={{marginRight: '5px'}}
+							style={{ marginRight: "5px" }}
 							size="small"
 							onClick={(e) => onClickCancel(e)}
 						>
 							Cancel
 						</Button>
-						<Button
-							type="primary"
-							size="small"
-							onClick={(e) => onClickSave(e)}
-						>
+						<Button type="primary" size="small" onClick={(e) => onClickSave(e)}>
 							Save
 						</Button>
 					</div>
 				</div>
 			) : (
-					<>
-						{props.stt}.{title}
-						<div onClick={(e) => editHandle(e)} style={{ cursor: "pointer" }}>
-							<Radio.Group
-								onChange={(e) => onChangeChoise(e.target.value)}
-								value={choise}
-							>
-								{rowLabel.map((item, i) => {
-									return (
-										<>
-											<div key={i}>
-												<Radio key={i} value={i}>
-													{item.content}
-												</Radio>
-											</div>
-										</>
-									);
-								})}
-							</Radio.Group>
-						</div>
-					</>
-				)}
+				<>
+					{props.stt}.{title}
+					<div onClick={(e) => editHandle(e)} style={{ cursor: "pointer" }}>
+						<Radio.Group
+							onChange={(e) => onChangeChoise(e.target.value)}
+							value={choise}
+						>
+							{rowLabel.map((item, i) => {
+								return (
+									<>
+										<div key={i}>
+											<Radio key={i} value={i}>
+												{item.content}
+											</Radio>
+										</div>
+									</>
+								);
+							})}
+						</Radio.Group>
+					</div>
+				</>
+			)}
 		</>
 	);
 };

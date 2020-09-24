@@ -1,11 +1,19 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { Question } from "../../components/questions";
-import { Button } from "@material-ui/core";
-import { Input } from 'antd';
+import { Input, Button } from 'antd';
+import {
+  numberToRomanize
+} from '../../libs/utils';
 
 const SurveySection = (props) => {
   const [isEdit, setEdit] = useState(false);
   const [title, setTitle] = useState('');
+
+  const componentDidMount = () => {
+    setTitle(props.surveySection.title)
+  };
+
+  useEffect(componentDidMount, []);
 
   const getDataQuestion = (value, key) => {
     props.saveQuestion(value, props.idxSection, key);
@@ -45,56 +53,68 @@ const SurveySection = (props) => {
       <Fragment>
         {isEdit ? <Fragment>
           <div className="col-md-12">
-            <Input
-              style={{ marginBottom: "10px" }}
+            <p style={{ fontSize: '20px', marginTop: '10px', marginBottom: '20px', fontWeight: 600 }}>{numberToRomanize(props.idxSection + 1)}. {props.surveySection.title}</p><Input
               onChange={onChangeTitle}
               defaultValue={props.surveySection.title}
               className="col-md-12"
-            /> <Button
-              style={{ marginRight: '5px' }}
-              size="small"
-              onClick={onCancel}
-            >
-              Cancel
+            />
+            <div style={{ marginTop: '7px' }}>
+              <Button
+                style={{ marginRight: '5px' }}
+                size="small"
+                onClick={onCancel}
+              >
+                Cancel
           </Button>
-            <Button
-              type="primary"
-              size="small"
-              onClick={e => onSave(e)}
-            >
-              Save
+              <Button
+                type="primary"
+                size="small"
+                onClick={e => onSave(e)}
+              >
+                Save
           </Button>
+            </div>
           </div>
         </Fragment> :
           <Fragment>
-            <div onClick={onEdit} className="col-md-12" style={{ fontSize: '16px', font: 'bold', marginTop: '20px' }}>{props.idxSection + 1}. {props.surveySection.title}</div>
+            <div onClick={onEdit} className="col-md-12" 
+            style={{ fontSize: '20px', font: 'bold', marginTop: '10px', marginBottom: '20px' }}>
+              {numberToRomanize(props.idxSection + 1)}. {props.surveySection.title}</div>
           </Fragment>
-
         }
-        {props.surveySection.questions.map((item, idx) => {
-          return (
-            <>
-              <Question
-                getDataQuestion={getDataQuestion}
-                type={item.input_type_id}
-                title={item.title}
-                id={item.id}
-                key={idx}
-                idxQues={idx}
-                typeSelect={item.input_type_id}
-                onChangeTypeQues={onChangeTypeQues}
-              />
-            </>
-          );
-        })}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addQuestion}
-          style={{ margin: "10px" }}
-        >
-          Thêm câu hỏi
+
+        <div className="col-md-12">
+          <div className="row" style={{ paddingBottom: '10px' }}>
+            {props.surveySection.questions.map((item, idx) => {
+              return (
+                <div className="col-md-12" style={{ marginTop: '10px', marginBottom: '20px' }}>
+                  <Question
+                    getDataQuestion={getDataQuestion}
+                    type={item.input_type_id}
+                    item={item}
+                    title={item.title}
+                    id={item.id}
+                    key={idx}
+                    idxQues={idx}
+                    typeSelect={item.input_type_id}
+                    onChangeTypeQues={onChangeTypeQues}
+                    isUpdate={props.isUpdate || false}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="col-md-12">
+          <Button
+            onClick={addQuestion}
+            style={{ margin: "10px", marginLeft: '0px', height: '35px', marginBottom: '10px' }}
+            type="primary"
+          >
+            Thêm câu hỏi
         </Button>
+        </div>
       </Fragment>
     </>
   );

@@ -33,8 +33,8 @@ const SurveyHeader = (props) => {
   return (
     <>
       {isEdit ? (
-        <div>
-          <TextArea
+        <div style={{ marginTop: '5px' }}>
+          Câu {props.stt + 1}. <TextArea
             style={{ marginBottom: "10px" }}
             rows={4}
             onChange={handleChangeCommentBox}
