@@ -5,6 +5,7 @@ import { CHECKBOX, GRID_MULTI_CHOISE } from "../config/common/TypeOfInput";
 import "./QuestionItem.scss";
 import { generateRandomCode } from "../libs/random";
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const GridMultiChoise = (props) => {
 	const [preTitle, setPreTitle] = useState(props.title);
@@ -146,12 +147,12 @@ const GridMultiChoise = (props) => {
 	const onClickSave = (e) => {
 		e = window.event || e;
 		e.preventDefault();
-		if (preTitle != "") {
+		if (preTitle != "" && whiteSpace(preTitle) > 0) {
 			setCurrentColumnLabel([...columnLabel]);
 			setCurrentRowLabel([...rowLabel]);
 
 			columnLabel.forEach((e, i) => {
-				if (e.title != "") {
+				if (e.title != "" && whiteSpace(e.title)>0) {
 					let column = {};
 					column.id = e.id || "";
 					column.title = e.title;
@@ -159,25 +160,31 @@ const GridMultiChoise = (props) => {
 					column.type = e.type;
 					column.index = i;
 					objGridMultiChoise.question_columns.push(column);
+				} else {
+					return showErrorMessage("Điền đầy đủ thông tin cột " + (i + 1))
+
 				}
 			});
 			if (objGridMultiChoise.question_columns.length != columnLabel.length) {
-				return showErrorMessage("Điền đầy đủ thông tin")
+				return 0;
 			}
 			objGridMultiChoise.delete_cols = listColDelete;
 
-			currentRowLabel.forEach((e) => {
-				if (e.title != "") {
+			currentRowLabel.forEach((e,i) => {
+				if (e.title != "" && whiteSpace(e.title)) {
 					let row = {};
 					row.id = e.id || "";
 					row.note = e.title;
 					row.title = e.title;
 					objGridMultiChoise.question_row.push(row);
+				} else {
+					return showErrorMessage("Điền đầy đủ thông tin hàng " + (i + 1))
+
 				}
 			});
 			if (rowLabel.length != objGridMultiChoise.question_row.length) {
-				return showErrorMessage("Điền đầy đủ thông tin")
-			  }
+				return 0;
+			}
 			objGridMultiChoise.delete_rows = listRowDelete;
 
 			if (preTitle !== "") {

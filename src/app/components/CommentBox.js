@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { COMMENT_BOX } from '../config/common/TypeOfInput';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 import { showErrorMessage } from "../actions/notification";
 const CommentBox = (props) => {
@@ -29,6 +30,7 @@ const CommentBox = (props) => {
 
   const handleSaveCommentBox = (e) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (titleUpdate === "") {
       return showErrorMessage("Lỗi ");
       
@@ -45,9 +47,11 @@ const CommentBox = (props) => {
 
 =======
     if (titleUpdate !== "" && title != "") {
+=======
+    if (titleUpdate !== "" && whiteSpace(titleUpdate) > 0) {
+>>>>>>> f236328cab42695510f301e09a51bdbe940e7e57
       setTitle(titleUpdate);
       data.title = titleUpdate;
-
       props.getDataSection(data);
       props.onCancel();
     }
