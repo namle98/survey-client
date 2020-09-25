@@ -110,14 +110,14 @@ const SingleChoise = (props) => {
     for ( var n = 0 ; n < rowLabel.length ; n++)
     {
       if(rowLabel[n].title === ""){
-        return showErrorMessage("Lỗi");
+        return showErrorMessage("Vui lòng nhập tiêu đề hàng" + objSingleChoise[n]);
       };
     }
     objSingleChoise.delete_choises = listDelete;
    
    
     if (preTitle === "") {
-      return showErrorMessage("Lỗi");
+      return showErrorMessage("Vui lòng nhập tiêu đề ");
     }
 
 
