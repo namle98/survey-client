@@ -33,19 +33,16 @@ const SingleTextbox = (props) => {
       else {
       setTitle(titleUpdate);
       data.title = titleUpdate;
-<<<<<<< HEAD
+
 
       props.onCancel();
       props.getDataSection(data);
     }
-    
-=======
+
       props.onCancel();
       props.getDataSection(data);
-    } else {
-      return showErrorMessage("Điền đầy đủ thông tin")
-    }
->>>>>>> 4aa31c5a69cb74d291655c41adf522eaafcfaddc
+    
+    
   };
 
 
