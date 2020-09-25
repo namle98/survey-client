@@ -94,7 +94,7 @@ const SingleChoise = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-<<<<<<< HEAD
+
     setCurrentRowLabel([...rowLabel]);
     rowLabel.forEach((e, i) => {
       let question = {};
@@ -128,7 +128,7 @@ const SingleChoise = (props) => {
 
     props.onCancel();
     props.getDataSection(objSingleChoise);
-=======
+
     if (preTitle != "") {
       setCurrentRowLabel([...rowLabel]);
       rowLabel.forEach((e, i) => {
@@ -143,7 +143,7 @@ const SingleChoise = (props) => {
           objSingleChoise.question_choise.push(question);
         }
       });
-      if(objSingleChoise.question_choise.length!=rowLabel.length){
+      if(objSingleChoise.question_choise.length != rowLabel.length){
         return showErrorMessage("Điền đầy đủ thông tin")
       }
       objSingleChoise.delete_choises = listDelete;
@@ -158,7 +158,6 @@ const SingleChoise = (props) => {
     else {
       return showErrorMessage("Điền đầy đủ thông tin")
     }
->>>>>>> 4aa31c5a69cb74d291655c41adf522eaafcfaddc
   };
  
   const editHandle = (e) => {
