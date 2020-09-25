@@ -4,6 +4,7 @@ import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { MULTI_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const MultiChoise = (props) => {
 
@@ -93,11 +94,11 @@ const MultiChoise = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    if (preTitle != "") {
+    if (preTitle != "" && whiteSpace(preTitle) > 0) {
       setCurrentRowLabel(rowLabel);
       setCurrentRowLabel([...rowLabel]);
       currentRowLabel.forEach((e, i) => {
-        if (e.title != "") {
+        if (e.title != "" && whiteSpace(e.title)>0) {
           let question = {};
           question.id = e.id || '';
           question.title = e.title;
@@ -105,10 +106,13 @@ const MultiChoise = (props) => {
           question.input_type_id = MULTI_CHOISE;
           question.index = i;
           objMultiChoise.question_choise.push(question);
+        } else {
+          return showErrorMessage("Nhập đầy đủ thông tin hàng " + (i + 1))
+
         }
       });
       if (objMultiChoise.question_choise.length != currentRowLabel.length) {
-        return showErrorMessage("Nhập đầy đủ thông tin")
+        return 0;
       }
       if (preTitle !== "") {
         setTitle(preTitle);
@@ -127,7 +131,6 @@ const MultiChoise = (props) => {
     e = window.event || e;
     props.onEdit();
   };
-
   const onClickCancel = (e) => {
     e = window.event || e;
     e.preventDefault();

@@ -6,6 +6,7 @@ import { STRING, GRID_TEXTBOX } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import './QuestionItem.scss';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const GridTextbox = (props) => {
   const [title, setTitle] = useState(
@@ -120,7 +121,7 @@ const GridTextbox = (props) => {
       setCurrentRowLabel([...rowLabel]);
       setSurrentColumnLabel([...columnLabel]);
       currentColumnLabel.forEach((e, i) => {
-        if (e.title != "") {
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let column = {};
           column.id = e.id;
           column.title = e.title;
@@ -128,24 +129,30 @@ const GridTextbox = (props) => {
           column.index = i;
           column.type = e.type;
           objGridTextbox.question_columns.push(column);
+        } else {
+          return showErrorMessage("Điền đầy đủ thông tin cột " + (i + 1))
+
         }
       });
       if (columnLabel.length != objGridTextbox.question_columns.length) {
-        return showErrorMessage("Điền đầy đủ thông tin")
+        return 0;
       }
       objGridTextbox.delete_cols = listColDelete;
 
       currentRowLabel.forEach((e, i) => {
-        if (e.title != "") {
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let row = {};
           row.id = e.id || '';
           row.note = e.note;
           row.title = e.title;
           objGridTextbox.question_row.push(row);
+        } else {
+          return showErrorMessage("Điền đầy đủ thông tin dòng" + (i + 1))
+
         }
       });
       if (rowLabel.length != objGridTextbox.question_row.length) {
-        return showErrorMessage("Điền đầy đủ thông tin")
+        return 0;
       }
       objGridTextbox.delete_rows = listRowDelete;
 

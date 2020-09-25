@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { SINGLE_TEXTBOX } from '../config/common/TypeOfInput';
 import { showErrorMessage } from "../actions/notification";
-
+import { slugify, whiteSpace } from "../libs/utils"
 const SingleTextbox = (props) => {
   const [title, setTitle] = useState(props.title
   );
@@ -23,14 +23,18 @@ const SingleTextbox = (props) => {
     setTitleUpdate(e.target.value);
 
   };
-
+ 
   const handleSaveTextbox = (e) => {
+<<<<<<< HEAD
     if (titleUpdate === "") {
      return showErrorMessage("Lỗi ");
      
     }
    
       else {
+=======
+     if (titleUpdate !== "" && whiteSpace(titleUpdate)>0) {
+>>>>>>> f236328cab42695510f301e09a51bdbe940e7e57
       setTitle(titleUpdate);
       data.title = titleUpdate;
 <<<<<<< HEAD

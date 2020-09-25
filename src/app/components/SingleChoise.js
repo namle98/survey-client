@@ -4,6 +4,7 @@ import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { RADIO, SINGLE_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const SingleChoise = (props) => {
 
@@ -132,8 +133,7 @@ const SingleChoise = (props) => {
     if (preTitle != "") {
       setCurrentRowLabel([...rowLabel]);
       rowLabel.forEach((e, i) => {
-        if (e.title != "") {
-          console.log("100   " + e.title)
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let question = {};
           question.id = e.id || '';
           question.title = e.title;
@@ -141,10 +141,18 @@ const SingleChoise = (props) => {
           question.index = i;
           question.input_type_id = SINGLE_CHOISE;
           objSingleChoise.question_choise.push(question);
+        } else {
+          return showErrorMessage("Điền đầy đủ thông tin hàng " + (i + 1))
+
         }
       });
+<<<<<<< HEAD
       if(objSingleChoise.question_choise.length != rowLabel.length){
         return showErrorMessage("Điền đầy đủ thông tin")
+=======
+      if (objSingleChoise.question_choise.length != rowLabel.length) {
+        return 0;
+>>>>>>> f236328cab42695510f301e09a51bdbe940e7e57
       }
       objSingleChoise.delete_choises = listDelete;
       if (preTitle !== "") {

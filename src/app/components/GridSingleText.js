@@ -5,6 +5,7 @@ import { STRING, GRID_SINGLE_TEXT } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import './QuestionItem.scss';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const GridSingleText = (props) => {
 
@@ -121,11 +122,11 @@ const GridSingleText = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    if (preTitle.split(" ") != "") {
+    if (preTitle != "" && whiteSpace(preTitle) > 0) {
       setCurrentRowLabel(rowLabel);
       setCurrentColumnLabel(columnLabel);
       columnLabel.forEach((e, i) => {
-        if (e.title.split(" ") != "") {
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let column = {};
           column.id = e.id || '';
           column.title = e.title;
@@ -133,24 +134,30 @@ const GridSingleText = (props) => {
           column.type = e.type;
           column.index = i;
           objGridSingleText.question_columns.push(column);
+        } else {
+          return showErrorMessage("Điền đầy đủ thông tin cột " + (i + 1))
+
         }
       });
       if (columnLabel.length != objGridSingleText.question_columns.length) {
-        return showErrorMessage("Điền đầy đủ thông tin")
+        return 0;
       }
       objGridSingleText.delete_rows = listRowDelete;
 
-      rowLabel.forEach((e) => {
-        if (e.title!= "") {
+      rowLabel.forEach((e, i) => {
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let row = {};
           row.id = e.id || '';
           row.note = e.title;
           row.title = e.title;
           objGridSingleText.question_row.push(row);
+        } else {
+          return showErrorMessage("Điền đầy đủ thông tin hàng " + (i + 1))
+
         }
       });
       if (rowLabel.length != objGridSingleText.question_row.length) {
-        return showErrorMessage("Điền đầy đủ thông tin")
+        return 0;
       }
       objGridSingleText.delete_rows = listRowDelete;
 

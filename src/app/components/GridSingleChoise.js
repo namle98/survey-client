@@ -6,6 +6,7 @@ import { RADIO, GRID_SINGLE_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import './QuestionItem.scss';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const GridSingleChoise = (props) => {
   const [preTitle, setPreTitle] = useState(props.title);
@@ -14,7 +15,8 @@ const GridSingleChoise = (props) => {
   const [listRowDelete, setListRowDelete] = useState([]);
   const [listColDelete, setListColDelete] = useState([]);
   const [currentColumnLabel, setCurrentColumnLabel] = useState([]);
-  const [rowLabel, setRowLabel] = useState([
+  const [colMissed, setColMissed] = useState()
+   const [rowLabel, setRowLabel] = useState([
     { title: "Nội dung hàng 1", unique: 'abcdefgh' },
     { title: "Nội dung hàng 2", unique: 'iklmnopq' },
     { title: "Nội dung hàng 3", unique: 'rstuvxyz' }
@@ -73,7 +75,7 @@ const GridSingleChoise = (props) => {
     e = window.event || e;
     e.preventDefault();
     setPreTitle(e.target.value);
-    console.log("change " + title + "   " + preTitle)
+    // console.log("change " + title + "   " + preTitle)
   };
 
   const handleChangeRowLabel = (e, idx) => {
@@ -145,19 +147,15 @@ const GridSingleChoise = (props) => {
   };
 
   const onClickSave = (e) => {
-    console.log("148  " + JSON.stringify(columnLabel))
-    console.log("148  " + JSON.stringify(rowLabel))
-
-    if (preTitle != "") {
+    let length = whiteSpace(preTitle)
+    if (preTitle != "" && length > 0) {
       e = window.event || e;
       e.preventDefault();
-
       setCurrentColumnLabel(...columnLabel);
-
       setCurrentRowLabel(...rowLabel);
-
       columnLabel.map((e, i) => {
-        if (e.title != "") {
+        console.log("158 " + whiteSpace(e.title))
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let column = {};
           column.id = e.id || '';
           column.title = e.title;
@@ -165,26 +163,32 @@ const GridSingleChoise = (props) => {
           column.index = i;
           column.type = e.type;
           objGridSingleChoise.question_columns.push(column);
+        } else {
+          return showErrorMessage("Điền  đầy đủ thông tin cột " + (i + 1))
+
         }
       });
-      if (columnLabel.length != objGridSingleChoise.question_columns.length) {
-        return showErrorMessage("Điền  đầy đủ thông tin")
+       if (columnLabel.length != objGridSingleChoise.question_columns.length) {
+        return 0;
       }
 
       objGridSingleChoise.delete_cols = listColDelete;
 
       rowLabel.map((e, i) => {
-        if (e.title != "") {
+        if (e.title != "" && whiteSpace(e.title) > 0) {
           let row = {};
           row.id = e.id || '';
           row.note = e.title;
           row.title = e.title;
           objGridSingleChoise.question_row.push(row);
           row = {};
+        } else {
+          return showErrorMessage("Điền  đầy đủ thông tin hàng " + (i + 1))
+
         }
       });
       if (rowLabel.length != objGridSingleChoise.question_row.length) {
-        return showErrorMessage("Điền  đầy đủ thông tin")
+        return 0;
       }
 
       objGridSingleChoise.delete_rows = listRowDelete;
@@ -198,7 +202,7 @@ const GridSingleChoise = (props) => {
       props.getDataSection(objGridSingleChoise);
     }
     else {
-      return showErrorMessage("Điền đầy đủ thông tin")
+      return showErrorMessage("Điền đầy đủ thông tin câu hỏi")
     }
   };
 
