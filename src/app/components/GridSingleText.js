@@ -4,10 +4,11 @@ import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { STRING, GRID_SINGLE_TEXT } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import './QuestionItem.scss';
+import { showErrorMessage } from "../actions/notification";
 
 const GridSingleText = (props) => {
 
-  const [preTitle, setPreTitle] = useState('');
+  const [preTitle, setPreTitle] = useState(props.title);
   const [currentRowLabel, setCurrentRowLabel] = useState([]);
   const [currentColumnLabel, setCurrentColumnLabel] = useState([]);
   const [listRowDelete, setListRowDelete] = useState([]);
@@ -120,37 +121,49 @@ const GridSingleText = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    setCurrentRowLabel(rowLabel);
-    setCurrentColumnLabel(columnLabel);
-    columnLabel.forEach((e, i) => {
-      let column = {};
-      column.id = e.id || '';
-      column.title = e.title;
-      column.note = e.note;
-      column.type = e.type;
-      column.index = i;
-      objGridSingleText.question_columns.push(column);
-    });
+    if (preTitle.split(" ") != "") {
+      setCurrentRowLabel(rowLabel);
+      setCurrentColumnLabel(columnLabel);
+      columnLabel.forEach((e, i) => {
+        if (e.title.split(" ") != "") {
+          let column = {};
+          column.id = e.id || '';
+          column.title = e.title;
+          column.note = e.note;
+          column.type = e.type;
+          column.index = i;
+          objGridSingleText.question_columns.push(column);
+        }
+      });
+      if (columnLabel.length != objGridSingleText.question_columns.length) {
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objGridSingleText.delete_rows = listRowDelete;
 
-    objGridSingleText.delete_rows = listRowDelete;
+      rowLabel.forEach((e) => {
+        if (e.title!= "") {
+          let row = {};
+          row.id = e.id || '';
+          row.note = e.title;
+          row.title = e.title;
+          objGridSingleText.question_row.push(row);
+        }
+      });
+      if (rowLabel.length != objGridSingleText.question_row.length) {
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objGridSingleText.delete_rows = listRowDelete;
 
-    rowLabel.forEach((e) => {
-      let row = {};
-      row.id = e.id || '';
-      row.note = e.title;
-      row.title = e.title;
-      objGridSingleText.question_row.push(row);
-    });
+      if (preTitle !== "") {
+        setTitle(preTitle);
+        objGridSingleText.title = preTitle;
+      }
 
-    objGridSingleText.delete_rows = listRowDelete;
-
-    if (preTitle !== "") {
-      setTitle(preTitle);
-      objGridSingleText.title = preTitle;
+      props.onCancel();
+      props.getDataSection(objGridSingleText);
+    } else {
+      return showErrorMessage("Điền đầy đủ thông tin")
     }
-
-    props.onCancel();
-    props.getDataSection(objGridSingleText);
   };
 
 

@@ -5,9 +5,10 @@ import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { RADIO, GRID_SINGLE_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import './QuestionItem.scss';
+import { showErrorMessage } from "../actions/notification";
 
 const GridSingleChoise = (props) => {
-  const [preTitle, setPreTitle] = useState("");
+  const [preTitle, setPreTitle] = useState(props.title);
   const [title, setTitle] = useState(props.title);
   const [currentRowLabel, setCurrentRowLabel] = useState([]);
   const [listRowDelete, setListRowDelete] = useState([]);
@@ -18,7 +19,7 @@ const GridSingleChoise = (props) => {
     { title: "Nội dung hàng 2", unique: 'iklmnopq' },
     { title: "Nội dung hàng 3", unique: 'rstuvxyz' }
   ]);
-
+  // bảng câu hỏi 1 đáp án
   const [columnLabel, setColumnLabel] = useState([
     { title: "Nội dung cột 1", type: RADIO, unique: 'abcdefgh' },
     { title: "Nội dung cột 2", type: RADIO, unique: 'iklmnopq' },
@@ -72,6 +73,7 @@ const GridSingleChoise = (props) => {
     e = window.event || e;
     e.preventDefault();
     setPreTitle(e.target.value);
+    console.log("change " + title + "   " + preTitle)
   };
 
   const handleChangeRowLabel = (e, idx) => {
@@ -143,43 +145,61 @@ const GridSingleChoise = (props) => {
   };
 
   const onClickSave = (e) => {
-    e = window.event || e;
-    e.preventDefault();
+    console.log("148  " + JSON.stringify(columnLabel))
+    console.log("148  " + JSON.stringify(rowLabel))
 
-    setCurrentColumnLabel(...columnLabel);
+    if (preTitle != "") {
+      e = window.event || e;
+      e.preventDefault();
 
-    setCurrentRowLabel(...rowLabel);
+      setCurrentColumnLabel(...columnLabel);
 
-    columnLabel.map((e, i) => {
-      let column = {};
-      column.id = e.id || '';
-      column.title = e.title;
-      column.note = e.title;
-      column.index = i;
-      column.type = e.type;
-      objGridSingleChoise.question_columns.push(column);
-    });
+      setCurrentRowLabel(...rowLabel);
 
-    objGridSingleChoise.delete_cols = listColDelete;
+      columnLabel.map((e, i) => {
+        if (e.title != "") {
+          let column = {};
+          column.id = e.id || '';
+          column.title = e.title;
+          column.note = e.title;
+          column.index = i;
+          column.type = e.type;
+          objGridSingleChoise.question_columns.push(column);
+        }
+      });
+      if (columnLabel.length != objGridSingleChoise.question_columns.length) {
+        return showErrorMessage("Điền  đầy đủ thông tin")
+      }
 
-    rowLabel.map((e, i) => {
-      let row = {};
-      row.id = e.id || '';
-      row.note = e.title;
-      row.title = e.title;
-      objGridSingleChoise.question_row.push(row);
-      row = {};
-    });
+      objGridSingleChoise.delete_cols = listColDelete;
 
-    objGridSingleChoise.delete_rows = listRowDelete;
+      rowLabel.map((e, i) => {
+        if (e.title != "") {
+          let row = {};
+          row.id = e.id || '';
+          row.note = e.title;
+          row.title = e.title;
+          objGridSingleChoise.question_row.push(row);
+          row = {};
+        }
+      });
+      if (rowLabel.length != objGridSingleChoise.question_row.length) {
+        return showErrorMessage("Điền  đầy đủ thông tin")
+      }
 
-    if (preTitle !== "") {
-      setTitle(preTitle);
-      objGridSingleChoise.title = preTitle;
+      objGridSingleChoise.delete_rows = listRowDelete;
+
+      if (preTitle !== "") {
+        setTitle(preTitle);
+        objGridSingleChoise.title = preTitle;
+      }
+
+      props.onCancel();
+      props.getDataSection(objGridSingleChoise);
     }
-
-    props.onCancel();
-    props.getDataSection(objGridSingleChoise);
+    else {
+      return showErrorMessage("Điền đầy đủ thông tin")
+    }
   };
 
   const editHandle = (e) => {

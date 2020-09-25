@@ -4,10 +4,9 @@ import { SINGLE_TEXTBOX } from '../config/common/TypeOfInput';
 import { showErrorMessage } from "../actions/notification";
 
 const SingleTextbox = (props) => {
-  const [title, setTitle] = useState(
-    props.title
+  const [title, setTitle] = useState(props.title
   );
-  const [titleUpdate, setTitleUpdate] = useState("");
+  const [titleUpdate, setTitleUpdate] = useState(props.title);
   let data = {
     id: props.id || '',
     title: title,
@@ -34,11 +33,19 @@ const SingleTextbox = (props) => {
       else {
       setTitle(titleUpdate);
       data.title = titleUpdate;
+<<<<<<< HEAD
 
       props.onCancel();
       props.getDataSection(data);
     }
     
+=======
+      props.onCancel();
+      props.getDataSection(data);
+    } else {
+      return showErrorMessage("Điền đầy đủ thông tin")
+    }
+>>>>>>> 4aa31c5a69cb74d291655c41adf522eaafcfaddc
   };
 
 
@@ -54,7 +61,7 @@ const SingleTextbox = (props) => {
             type="text"
             onChange={handleChangeTextbox}
             defaultValue={title}
-          />
+          ></Input>
           <Button
             style={{ marginRight: '5px' }}
             size="small"

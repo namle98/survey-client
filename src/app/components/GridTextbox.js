@@ -5,13 +5,14 @@ import RemoveCircleOutline from "@material-ui/icons/RemoveCircleOutline";
 import { STRING, GRID_TEXTBOX } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
 import './QuestionItem.scss';
+import { showErrorMessage } from "../actions/notification";
 
 const GridTextbox = (props) => {
   const [title, setTitle] = useState(
     props.title
   );
 
-  const [titleUpdate, setTitleUpdate] = useState("")
+  const [titleUpdate, setTitleUpdate] = useState(props.title)
   const [currentRowLabel, setCurrentRowLabel] = useState([]);
   const [currentColumnLabel, setSurrentColumnLabel] = useState([]);
   const [listRowDelete, setListRowDelete] = useState([]);
@@ -29,6 +30,7 @@ const GridTextbox = (props) => {
   ]);
 
   const componentDidMount = () => {
+    console.log("GRID TEXT")
     if (props.item && props.item.question_row) {
       let rowItem = props.item.question_row.map(item => {
         return {
@@ -111,37 +113,49 @@ const GridTextbox = (props) => {
     props.onCancel();
   };
 
-  const handleSaveGridTextbox = () => {
-    setCurrentRowLabel([...rowLabel]);
-    setSurrentColumnLabel([...columnLabel]);
-    currentColumnLabel.forEach((e, i) => {
-      let column = {};
-      column.id = e.id;
-      column.title = e.title;
-      column.note = e.title;
-      column.index = i;
-      column.type = e.type;
-      objGridTextbox.question_columns.push(column);
-    });
+  const handleSaveGridTextbox = (e) => {
+    e = window.event || e;
+    e.preventDefault();
+    if (titleUpdate != "") {
+      setCurrentRowLabel([...rowLabel]);
+      setSurrentColumnLabel([...columnLabel]);
+      currentColumnLabel.forEach((e, i) => {
+        if (e.title != "") {
+          let column = {};
+          column.id = e.id;
+          column.title = e.title;
+          column.note = e.title;
+          column.index = i;
+          column.type = e.type;
+          objGridTextbox.question_columns.push(column);
+        }
+      });
+      if (columnLabel.length != objGridTextbox.question_columns.length) {
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objGridTextbox.delete_cols = listColDelete;
 
-    objGridTextbox.delete_cols = listColDelete;
+      currentRowLabel.forEach((e, i) => {
+        if (e.title != "") {
+          let row = {};
+          row.id = e.id || '';
+          row.note = e.note;
+          row.title = e.title;
+          objGridTextbox.question_row.push(row);
+        }
+      });
+      if (rowLabel.length != objGridTextbox.question_row.length) {
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objGridTextbox.delete_rows = listRowDelete;
 
-    currentRowLabel.forEach((e, i) => {
-      let row = {};
-      row.id = e.id || '';
-      row.note = e.note;
-      row.title = e.title;
-      objGridTextbox.question_row.push(row);
-    });
-
-    objGridTextbox.delete_rows = listRowDelete;
-
-    if (titleUpdate !== "") {
-      setTitle(titleUpdate);
-      objGridTextbox.title = titleUpdate;
-    }
-    props.getDataSection(objGridTextbox);
-    props.onCancel();
+      if (titleUpdate !== "") {
+        setTitle(titleUpdate);
+        objGridTextbox.title = titleUpdate;
+      }
+      props.getDataSection(objGridTextbox);
+      props.onCancel();
+    } else { return showErrorMessage("Điền đầy đủ thông tin") }
   };
 
   const removeRowLabel = (e, idx) => {

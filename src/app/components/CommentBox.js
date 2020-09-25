@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { COMMENT_BOX } from '../config/common/TypeOfInput';
+import { showErrorMessage } from "../actions/notification";
 
 import { showErrorMessage } from "../actions/notification";
 const CommentBox = (props) => {
   const [title, setTitle] = useState(
     props.title
   );
-  const [titleUpdate, setTitleUpdate] = useState("");
+  const [titleUpdate, setTitleUpdate] = useState(props.title);
   const { TextArea } = Input;
 
   let data = {
@@ -27,6 +28,7 @@ const CommentBox = (props) => {
   };
 
   const handleSaveCommentBox = (e) => {
+<<<<<<< HEAD
     if (titleUpdate === "") {
       return showErrorMessage("Lỗi ");
       
@@ -41,6 +43,18 @@ const CommentBox = (props) => {
      }
 
 
+=======
+    if (titleUpdate !== "" && title != "") {
+      setTitle(titleUpdate);
+      data.title = titleUpdate;
+
+      props.getDataSection(data);
+      props.onCancel();
+    }
+    else {
+      return showErrorMessage("Điền đầy đủ thông tin")
+    }
+>>>>>>> 4aa31c5a69cb74d291655c41adf522eaafcfaddc
   };
 
   return (
@@ -48,7 +62,8 @@ const CommentBox = (props) => {
       {props.isEdit ? (
         <div style={{ width: "100%", height: "100px" }}>
           <div style={{ marginTop: '5px' }}>
-            <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
+            <Input
               style={{ marginBottom: "10px", height: '38px' }}
               onChange={handleChangeCommentBox}
               defaultValue={title}

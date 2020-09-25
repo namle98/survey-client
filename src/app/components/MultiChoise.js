@@ -3,10 +3,11 @@ import { Checkbox, Button, Input } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { MULTI_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
+import { showErrorMessage } from "../actions/notification";
 
 const MultiChoise = (props) => {
 
-  const [preTitle, setPreTitle] = useState('');
+  const [preTitle, setPreTitle] = useState(props.title);
   const [currentRowLabel, setCurrentRowLabel] = useState([]);
   const [title, setTitle] = useState(
     props.title
@@ -92,25 +93,34 @@ const MultiChoise = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    setCurrentRowLabel(rowLabel);
-    setCurrentRowLabel([...rowLabel]);
-    currentRowLabel.forEach((e, i) => {
-      let question = {};
-      question.id = e.id || '';
-      question.title = e.title;
-      question.type = MULTI_CHOISE;
-      question.input_type_id = MULTI_CHOISE;
-      question.index = i;
-      objMultiChoise.question_choise.push(question);
-    });
-
-    if (preTitle !== "") {
-      setTitle(preTitle);
-      objMultiChoise.title = preTitle;
+    if (preTitle != "") {
+      setCurrentRowLabel(rowLabel);
+      setCurrentRowLabel([...rowLabel]);
+      currentRowLabel.forEach((e, i) => {
+        if (e.title != "") {
+          let question = {};
+          question.id = e.id || '';
+          question.title = e.title;
+          question.type = MULTI_CHOISE;
+          question.input_type_id = MULTI_CHOISE;
+          question.index = i;
+          objMultiChoise.question_choise.push(question);
+        }
+      });
+      if (objMultiChoise.question_choise.length != currentRowLabel.length) {
+        return showErrorMessage("Nhập đầy đủ thông tin")
+      }
+      if (preTitle !== "") {
+        setTitle(preTitle);
+        objMultiChoise.title = preTitle;
+      }
+      objMultiChoise.delete_choises = listDelete;
+      props.onCancel();
+      props.getDataSection(objMultiChoise);
     }
-    objMultiChoise.delete_choises = listDelete;
-    props.onCancel();
-    props.getDataSection(objMultiChoise);
+    else {
+      return showErrorMessage("Nhập đầy đủ thông tin")
+    }
   };
 
   const editHandle = (e) => {
@@ -130,7 +140,7 @@ const MultiChoise = (props) => {
       {props.isEdit ? (
         <div>
           <div style={{ marginTop: '5px' }}>
-          <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
               style={{ marginBottom: "10px", height: '38px' }}
               type="text"
               onChange={handleChange}
@@ -183,7 +193,7 @@ const MultiChoise = (props) => {
                 return (
                   <>
                     <div key={i} style={{ marginBottom: '7px' }}>
-                      <Checkbox style={{marginRight: '8px'}}/> {item.title}
+                      <Checkbox style={{ marginRight: '8px' }} /> {item.title}
                     </div>
                   </>
                 );
