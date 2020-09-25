@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { SINGLE_TEXTBOX } from '../config/common/TypeOfInput';
 import { showErrorMessage } from "../actions/notification";
-
+import { slugify, whiteSpace } from "../libs/utils"
 const SingleTextbox = (props) => {
   const [title, setTitle] = useState(props.title
   );
@@ -22,12 +22,9 @@ const SingleTextbox = (props) => {
     e.preventDefault();
     setTitleUpdate(e.target.value);
   };
-  
+ 
   const handleSaveTextbox = (e) => {
-    setTitleUpdate(titleUpdate.replace(/\s+/g, ""))
-    console.log("{" + titleUpdate.replace(/\s+/g, "") + "}")
-    console.log(titleUpdate)
-    if (titleUpdate !== "") {
+     if (titleUpdate !== "" && whiteSpace(titleUpdate)>0) {
       setTitle(titleUpdate);
       data.title = titleUpdate;
       props.onCancel();

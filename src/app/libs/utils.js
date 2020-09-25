@@ -1,4 +1,8 @@
 /* eslint-disable no-useless-escape */
+export function whiteSpace(str){
+  let newString = str.replace(/\s+/g, "")
+  return newString.length;
+}
 export function slugify(str) {
   let slug = "";
   // Change to lower case

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "antd";
 import { COMMENT_BOX } from '../config/common/TypeOfInput';
 import { showErrorMessage } from "../actions/notification";
+import { whiteSpace } from "../libs/utils";
 
 const CommentBox = (props) => {
   const [title, setTitle] = useState(
@@ -27,10 +28,9 @@ const CommentBox = (props) => {
   };
 
   const handleSaveCommentBox = (e) => {
-    if (titleUpdate !== "" && title != "") {
+    if (titleUpdate !== "" && whiteSpace(titleUpdate) > 0) {
       setTitle(titleUpdate);
       data.title = titleUpdate;
-
       props.getDataSection(data);
       props.onCancel();
     }
