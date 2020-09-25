@@ -4,10 +4,11 @@ import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { CHECKBOX, GRID_MIX, NUMBER, RADIO, STRING, TYPE_OF_COLUMNS } from '../config/common/TypeOfInput';
 import './QuestionItem.scss';
 import { generateRandomCode } from '../libs/random';
+import { showErrorMessage } from "../actions/notification";
 const { Option } = Select;
 
 const GridMix = (props) => {
-  const [preTitle, setPreTitle] = useState('');
+  const [preTitle, setPreTitle] = useState(props.title);
   const [title, setTitle] = useState(
     props.title
   );
@@ -148,38 +149,51 @@ const GridMix = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    setCurrentColumnLabel([...columnLabel]);
-    setCurrentRowLabel([...rowLabel]);
+    if (preTitle != "") {
+      setCurrentColumnLabel([...columnLabel]);
+      setCurrentRowLabel([...rowLabel]);
 
-    columnLabel.forEach((e, i) => {
-      let column = {};
-      column.id = e.id || '';
-      column.title = e.title;
-      column.note = e.note;
-      column.type = e.type;
-      column.index = i;
-      objGridMultiChoise.question_columns.push(column);
-    });
+      columnLabel.forEach((e, i) => {
+        if (e.title != "") {
+          let column = {};
+          column.id = e.id || '';
+          column.title = e.title;
+          column.note = e.note;
+          column.type = e.type;
+          column.index = i;
+          objGridMultiChoise.question_columns.push(column);
+        }
+      });
+      if (columnLabel.length != objGridMultiChoise.question_columns.length) {
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objGridMultiChoise.delete_cols = listColDelete;
 
-    objGridMultiChoise.delete_cols = listColDelete;
+      currentRowLabel.forEach((e) => {
+        if (e.title != "") {
+          let row = {};
+          row.id = e.id || '';
+          row.note = e.title;
+          row.title = e.title;
+          objGridMultiChoise.question_row.push(row);
+        }
+      });
+      if (rowLabel.length != objGridMultiChoise.question_row.length) {
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objGridMultiChoise.delete_rows = listRowDelete;
 
-    currentRowLabel.forEach((e) => {
-      let row = {};
-      row.id = e.id || '';
-      row.note = e.title;
-      row.title = e.title;
-      objGridMultiChoise.question_row.push(row);
-    });
+      if (preTitle !== "") {
+        setTitle(preTitle);
+        objGridMultiChoise.title = preTitle;
+      }
 
-    objGridMultiChoise.delete_rows = listRowDelete;
-
-    if (preTitle !== "") {
-      setTitle(preTitle);
-      objGridMultiChoise.title = preTitle;
+      props.onCancel();
+      props.getDataSection(objGridMultiChoise);
     }
-
-    props.onCancel();
-    props.getDataSection(objGridMultiChoise);
+    else {
+      return showErrorMessage("Điền đầy đủ thông tin")
+    }
   };
 
   const editHandle = (e) => {

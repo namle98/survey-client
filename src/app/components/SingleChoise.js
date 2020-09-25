@@ -3,11 +3,12 @@ import { Button, Input, Radio } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
 import { RADIO, SINGLE_CHOISE } from '../config/common/TypeOfInput';
 import { generateRandomCode } from '../libs/random';
+import { showErrorMessage } from "../actions/notification";
 
 const SingleChoise = (props) => {
 
   const [currentRowLabel, setCurrentRowLabel] = useState([]);
-  const [preTitle, setPreTitle] = useState('');
+  const [preTitle, setPreTitle] = useState(props.title);
   const [title, setTitle] = useState(
     props.title
   );
@@ -52,6 +53,7 @@ const SingleChoise = (props) => {
     e = window.event || e;
     e.preventDefault();
     setPreTitle(e.target.value);
+    console.log("pre " + preTitle)
   };
 
   const handleChangeRowLabel = (e, idx) => {
@@ -92,25 +94,35 @@ const SingleChoise = (props) => {
   const onClickSave = (e) => {
     e = window.event || e;
     e.preventDefault();
-    setCurrentRowLabel([...rowLabel]);
-    rowLabel.forEach((e, i) => {
-      let question = {};
-      question.id = e.id || '';
-      question.title = e.title;
-      question.type = RADIO;
-      question.index = i;
-      question.input_type_id = SINGLE_CHOISE;
-      objSingleChoise.question_choise.push(question);
-    });
-
-    objSingleChoise.delete_choises = listDelete;
-
-    if (preTitle !== "") {
-      setTitle(preTitle);
-      objSingleChoise.title = preTitle;
+    if (preTitle != "") {
+      setCurrentRowLabel([...rowLabel]);
+      rowLabel.forEach((e, i) => {
+        if (e.title != "") {
+          console.log("100   " + e.title)
+          let question = {};
+          question.id = e.id || '';
+          question.title = e.title;
+          question.type = RADIO;
+          question.index = i;
+          question.input_type_id = SINGLE_CHOISE;
+          objSingleChoise.question_choise.push(question);
+        }
+      });
+      if(objSingleChoise.question_choise.length!=rowLabel.length){
+        return showErrorMessage("Điền đầy đủ thông tin")
+      }
+      objSingleChoise.delete_choises = listDelete;
+      if (preTitle !== "") {
+        setTitle(preTitle);
+        objSingleChoise.title = preTitle;
+      }
+      console.log(JSON.stringify(objSingleChoise))
+      props.onCancel();
+      props.getDataSection(objSingleChoise);
     }
-    props.onCancel();
-    props.getDataSection(objSingleChoise);
+    else {
+      return showErrorMessage("Điền đầy đủ thông tin")
+    }
   };
 
   const editHandle = (e) => {
@@ -130,7 +142,8 @@ const SingleChoise = (props) => {
       {props.isEdit ? (
         <div>
           <div style={{ marginTop: '5px' }}>
-            <p className='title-question'>Câu {props.stt + 1}. {title}</p> <Input
+            <p className='title-question'>Câu {props.stt + 1}. {title}</p>
+            <Input
               style={{ marginBottom: "10px", height: '38px' }}
               type="text"
               onChange={handleChange}
