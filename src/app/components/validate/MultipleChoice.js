@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Checkbox, Button, Input } from "antd";
 import { AddCircleOutline, RemoveCircleOutline } from "@material-ui/icons";
-import { CHECKBOX, GRID_MULTI_CHOISE } from "../config/common/TypeOfInput";
-import "./QuestionItem.scss";
-import { generateRandomCode } from "../libs/random";
-import { showErrorMessage } from "../actions/notification";
+import { CHECKBOX, GRID_MULTI_CHOISE } from "./../../config/common/TypeOfInput";
+import "./.././QuestionItem.scss";
+import { generateRandomCode } from "./../../libs/random";
 
-const GridMultiChoise = (props) => {
-	const [preTitle, setPreTitle] = useState(props.title);
+const props={
+    
+}
+const MultipleChoice = (props) => {
+	const [preTitle, setPreTitle] = useState("");
 	const [title, setTitle] = useState(props.title);
 
 	const [currentRowLabel, setCurrentRowLabel] = useState([]);
@@ -146,51 +148,38 @@ const GridMultiChoise = (props) => {
 	const onClickSave = (e) => {
 		e = window.event || e;
 		e.preventDefault();
-		if (preTitle != "") {
-			setCurrentColumnLabel([...columnLabel]);
-			setCurrentRowLabel([...rowLabel]);
+		setCurrentColumnLabel([...columnLabel]);
+		setCurrentRowLabel([...rowLabel]);
 
-			columnLabel.forEach((e, i) => {
-				if (e.title != "") {
-					let column = {};
-					column.id = e.id || "";
-					column.title = e.title;
-					column.note = e.note;
-					column.type = e.type;
-					column.index = i;
-					objGridMultiChoise.question_columns.push(column);
-				}
-			});
-			if (objGridMultiChoise.question_columns.length != columnLabel.length) {
-				return showErrorMessage("Điền đầy đủ thông tin")
-			}
-			objGridMultiChoise.delete_cols = listColDelete;
+		columnLabel.forEach((e, i) => {
+			let column = {};
+			column.id = e.id || "";
+			column.title = e.title;
+			column.note = e.note;
+			column.type = e.type;
+			column.index = i;
+			objGridMultiChoise.question_columns.push(column);
+		});
 
-			currentRowLabel.forEach((e) => {
-				if (e.title != "") {
-					let row = {};
-					row.id = e.id || "";
-					row.note = e.title;
-					row.title = e.title;
-					objGridMultiChoise.question_row.push(row);
-				}
-			});
-			if (rowLabel.length != objGridMultiChoise.question_row.length) {
-				return showErrorMessage("Điền đầy đủ thông tin")
-			  }
-			objGridMultiChoise.delete_rows = listRowDelete;
+		objGridMultiChoise.delete_cols = listColDelete;
 
-			if (preTitle !== "") {
-				setTitle(preTitle);
-				objGridMultiChoise.title = preTitle;
-			}
+		currentRowLabel.forEach((e) => {
+			let row = {};
+			row.id = e.id || "";
+			row.note = e.title;
+			row.title = e.title;
+			objGridMultiChoise.question_row.push(row);
+		});
 
-			props.onCancel();
-			props.getDataSection(objGridMultiChoise);
+		objGridMultiChoise.delete_rows = listRowDelete;
+
+		if (preTitle !== "") {
+			setTitle(preTitle);
+			objGridMultiChoise.title = preTitle;
 		}
-		else {
-			return showErrorMessage("Điền đầy đủ thông tin")
-		}
+
+		props.onCancel();
+		props.getDataSection(objGridMultiChoise);
 	};
 
 	const editHandle = (e) => {
@@ -287,57 +276,57 @@ const GridMultiChoise = (props) => {
 					</div>
 				</div>
 			) : (
-					<>
-						<p className="title-question">
-							Câu {props.stt + 1}. {title}
-						</p>
-						<div onClick={editHandle} style={{ cursor: "pointer" }}>
-							<table>
-								<thead>
-									<tr>
-										<th></th>
-										{columnLabel.map((e, i) => {
-											return (
-												<th
-													key={i}
-													className="td-table-create-question th-table-question-view"
-												>
-													{e.title}
-												</th>
-											);
-										})}
-									</tr>
-								</thead>
-								<tbody>
-									{rowLabel.map((item, i) => {
+				<>
+					<p className="title-question">
+						Câu {props.stt + 1}. {title}
+					</p>
+					<div onClick={editHandle} style={{ cursor: "pointer" }}>
+						<table>
+							<thead>
+								<tr>
+									<th></th>
+									{columnLabel.map((e, i) => {
 										return (
-											<tr key={i}>
-												<td className="td-table-create-question">{item.title}</td>
-												{columnLabel.map((sub, i) => {
-													return (
-														<td
-															key={i}
-															style={{
-																margin: "auto",
-																textAlign: "center",
-																border: "solid",
-																borderWidth: "thin",
-															}}
-														>
-															<Checkbox />
-														</td>
-													);
-												})}
-											</tr>
+											<th
+												key={i}
+												className="td-table-create-question th-table-question-view"
+											>
+												{e.title}
+											</th>
 										);
 									})}
-								</tbody>
-							</table>
-						</div>
-					</>
-				)}
+								</tr>
+							</thead>
+							<tbody>
+								{rowLabel.map((item, i) => {
+									return (
+										<tr key={i}>
+											<td className="td-table-create-question">{item.title}</td>
+											{columnLabel.map((sub, i) => {
+												return (
+													<td
+														key={i}
+														style={{
+															margin: "auto",
+															textAlign: "center",
+															border: "solid",
+															borderWidth: "thin",
+														}}
+													>
+														<Checkbox />
+													</td>
+												);
+											})}
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+					</div>
+				</>
+			)}
 		</>
 	);
 };
 
-export default GridMultiChoise;
+export default MultipleChoice;

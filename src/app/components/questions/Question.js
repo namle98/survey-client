@@ -71,7 +71,7 @@ const Question = (props) => {
             changeTypeWhileSave={changeTypeWhileSave}
             isUpdate={props.isUpdate || false}
           />
-        );
+        ); 
       case SINGLE_TEXTBOX:
         return (
           <SingleTextbox
